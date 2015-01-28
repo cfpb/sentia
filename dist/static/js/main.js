@@ -10665,6 +10665,7 @@ jQuery.extend( jQuery.easing,
 
 }(jQuery));
 
+
 // Count all features included in the test page.
 $('.feature-list').append(
   '<section class="feature-list_item block block__padded-top block__border-top">' +
@@ -10674,3 +10675,26 @@ $('.feature-list').append(
   'cf-components.</p>' +
   '</section>'
 );
+
+function getData(endpoint, params){
+	return $.ajax({
+            url: endpoint,
+            data: params,
+            traditional: true,
+            success: console.log('AJAX query successful')
+        }).fail( function( status ){
+            console.log( 'no data was available at' + endpoint + '. Status: ' + status );
+        });
+}
+
+function init(){
+	$.when(  ).then(   ).done( function(  ){
+
+	});
+}
+
+
+// Document.ready:
+$(function(){
+
+});

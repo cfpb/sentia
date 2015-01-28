@@ -21,7 +21,8 @@
     "cf-icons": "*",
     "cf-layout": "~0.2.2",
     "cf-pagination": "~0.5.0",
-    "cf-typography": "~0.7.0"
+    "cf-typography": "~0.7.0",
+    "d3": "~3.5"
   },
   "exportsOverride": {
     "cf-*": {

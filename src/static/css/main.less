@@ -18,6 +18,9 @@
 // Override the Capital Framework theme variables with colors from the brand color palette.
 @import (less) "cf-theme-overrides.less";
 
+// Import the D3 Diagram LESS and include it in the overall CSS
+@import (less) "diagram.less";
+
 // We've generated some sample rules for you. They're used with the index.html file.
 // Please delete them before starting your project.
 
@@ -114,4 +117,24 @@
 // Project-specific, non-generated LESS Below:
 #pageHeader {
     margin-bottom: 0;
+}
+.content_main {
+    padding-top: 20px;
+}
+#nodeDiagram{
+    display:inline-block;
+    height: 700px;
+}
+#nodeDetails{
+    position: relative;
+    display:inline-block;
+    height: 700px;
+    width:30%;
+    .detail-content {
+        position: absolute;
+        top: 50%;
+    }
+}
+footer.content_main{
+    font-size:.9em;
 }

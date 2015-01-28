@@ -65,6 +65,7 @@ module.exports = function(grunt) {
           '<%= loc.src %>/vendor/jquery/jquery.js',
           '<%= loc.src %>/vendor/jquery.easing/jquery.easing.js',
           '<%= loc.src %>/vendor/cf-*/*.js',
+          // '<%= loc.src %>/vendor/d3/d3.min.js',
           '!<%= loc.src %>/vendor/cf-*/Gruntfile.js',
           '<%= loc.src %>/static/js/app.js'
         ],
@@ -268,7 +269,7 @@ module.exports = function(grunt) {
         quotmark: true,
         sub: true,
         boss: true,
-        strict: true,
+        strict: false,
         evil: true,
         eqnull: true,
         browser: true,
