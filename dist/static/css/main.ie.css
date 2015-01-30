@@ -9934,15 +9934,40 @@ body {
 }
 
 #nodeDiagram {
+  height: 800px;
   display: inline-block;
-  height: 655px;
+  box-sizing: border-box;
+  border: solid transparent;
+  border-width: 0 15px;
+  margin-right: -0.25em;
+  vertical-align: top;
+  width: 66.66666667%;
+}
+
+.lt-ie8 #nodeDiagram {
+  display: inline;
+  margin-right: 0;
+  zoom: 1;
+  behavior: url('/static/vendor/box-sizing-polyfill/boxsizing.htc');
 }
 
 #nodeDetails {
   position: relative;
+  height: 800px;
   display: inline-block;
-  height: 655px;
-  width: 30%;
+  box-sizing: border-box;
+  border: solid transparent;
+  border-width: 0 15px;
+  margin-right: -0.25em;
+  vertical-align: top;
+  width: 33.33333333%;
+}
+
+.lt-ie8 #nodeDetails {
+  display: inline;
+  margin-right: 0;
+  zoom: 1;
+  behavior: url('/static/vendor/box-sizing-polyfill/boxsizing.htc');
 }
 
 #nodeDetails .detail-content {

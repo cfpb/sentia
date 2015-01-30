@@ -162,8 +162,7 @@ function getData(endpoint, params){
 }
 
 function eddaResponse(data){
-    eddaData = data;
-    return true;
+    eddaData = { key: "Enclave", values: data };
 }
 
 
@@ -195,7 +194,7 @@ function getCircleSize(instType){
 function drawDiagram( eddaJson ){
     // Example borrowed from Mike Bostock's Awesome Zoomable Circle Packing: http://bl.ocks.org/mbostock/7607535
     var margin = 20,
-        diameter = 650;
+        diameter = 700; // TODO: Make this be 75% of the page width
         // diameter = window.innerHeight ||
         //          html.clientHeight  ||
         //          body.clientHeight  ||
@@ -210,22 +209,46 @@ function drawDiagram( eddaJson ){
         .padding(2)
         .size([diameter - margin, diameter - margin])
         .value(function(d) { return 500; })
+        .children(function(d){ return d.values });
 
     var svg = d3.select("#nodeDiagram").append("svg")
         .attr("width", diameter)
         .attr("height", diameter)
       .append("g")
         .attr("transform", "translate(" + diameter / 2 + "," + diameter / 2 + ")");
+        
+    console.log("Edda JSON: ", eddaJson);
+    
+    var rootData = {key: "Enclave", values: d3.nest()
+            .key(function(d) { return d.vpcId })
+            .key(function(d) { return d.subnetId })
+            .entries( eddaJson.values )
+            }; //create the root data object
+    
+    var root = rootData;
+            
+    console.log("EddaJson as Root Data: ", root);
 
-      var root = { name: "eddaJson", children: eddaJson }; //create the root data object
-      var focus = root,
+        // var map = {
+        //     name: "key",
+        //     children: "value"
+        // }            
+
+        // _.each(eddaJson.children function(value, key){
+        //     key = map[key] || key;
+        //     b[key] = value;
+        // });
+
+        var focus = root,
           nodes = pack.nodes(root),
           view;
 
+          console.log("Nodes: ", nodes);
       var circle = svg.selectAll("circle")
         .data(nodes)
         .enter().append("circle")
           .attr("class", function(d) { return d.parent ? d.children ? "node" : "node node--leaf" : "node node--root"; })
+          .attr("data-identifier", function(d) { return d.key ? d.instanceId : "NO INFO"; })
           .style("fill", function(d) { return d.children ? color(d.depth) : null; })
           .on("click", function(d) { if (focus !== d) zoom(d), d3.event.stopPropagation(); });
 
@@ -235,7 +258,13 @@ function drawDiagram( eddaJson ){
           .attr("class", "label")
           .style("fill-opacity", function(d) { return d.parent === root ? 1 : 0; })
           .style("display", function(d) { return d.parent === root ? null : "none"; })
-          .text(function(d) { return d.instanceId; });
+          .text(function(d) {
+            if( typeof d.key === "undefined"){
+                return d.privateDnsName;
+            } else {
+                return d.key;
+            }
+        });
 
       var node = svg.selectAll("circle.node,text")
 

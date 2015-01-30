@@ -63,6 +63,7 @@ module.exports = function(grunt) {
       js: {
         src: [
           '<%= loc.src %>/vendor/jquery/jquery.js',
+          '<%= loc.src %>/vendor/underscore/underscore-min.js',
           '<%= loc.src %>/vendor/jquery.easing/jquery.easing.js',
           '<%= loc.src %>/vendor/cf-*/*.js',
           // '<%= loc.src %>/vendor/d3/d3.min.js',
