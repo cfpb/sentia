@@ -9693,7 +9693,7 @@ figure img {
 }
 
 .label {
-  font: 11px "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: 10px "Helvetica Neue", Helvetica, Arial, sans-serif;
   text-anchor: middle;
   text-shadow: 0 1px 0 #ffffff, 1px 0 0 #ffffff, -1px 0 0 #ffffff, 0 -1px 0 #ffffff;
 }
@@ -9935,13 +9935,13 @@ body {
 
 #nodeDiagram {
   display: inline-block;
-  height: 700px;
+  height: 655px;
 }
 
 #nodeDetails {
   position: relative;
   display: inline-block;
-  height: 700px;
+  height: 655px;
   width: 30%;
 }
 

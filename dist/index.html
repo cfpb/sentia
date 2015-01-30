@@ -130,9 +130,69 @@
     or section of the site, all custom JS should be added to src/static/js/app.js.
 -->
 <script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="/local/localVars.js"></script>
 <script src="/static/js/main.min.js"></script>
 <script>
-$(function(){
+
+var eddaData;
+
+function createEndpoint(params){
+    if(typeof params.collection === 'undefined' || typeof params.subject === 'undefined' || typeof params.query === 'undefined'){
+        return console.log("Error - insufficient query parameters");
+    }
+    return serverURL + '/edda/api/v2/' + params.collection + '/' + params.subject + '/' + params.query;
+}
+
+function getData(endpoint, params){
+    var request = $.ajax({
+        dataType: 'jsonp',
+        jsonpCallback: 'eddaResponse',
+        url: endpoint,
+        success: console.log('Edda get successful!')
+    });
+    request.fail( function( status ){
+        console.log( 'no data was available at' + endpoint + '. status: ' + status );
+    });
+    request.done(function( status ){
+        console.log( "Done!" );
+    });
+    request.complete( function( status ){
+        console.log( "Complete" );
+    });        
+}
+
+function eddaResponse(data){
+    eddaData = data;
+    return true;
+}
+
+
+
+function buildPage( dataFunctions ){
+    // When a filter is applied, requery everything and redraw the diagram
+    $.when( dataFunctions ).done(function( results ){
+        console.log("results: ", results);
+    });
+}
+
+/* 
+    UTILITY FUNCTIONS  
+*/
+
+function getCircleSize(instType){
+    switch( instType ){
+        case '':
+            return 300;
+            break;
+        case '':
+            return 200;
+            break;        
+        default:
+            return 100;
+    }
+}
+
+function drawDiagram( eddaJson ){
     // Example borrowed from Mike Bostock's Awesome Zoomable Circle Packing: http://bl.ocks.org/mbostock/7607535
     var margin = 20,
         diameter = 650;
@@ -149,7 +209,7 @@ $(function(){
     var pack = d3.layout.pack()
         .padding(2)
         .size([diameter - margin, diameter - margin])
-        .value(function(d) { return d.size; })
+        .value(function(d) { return 500; })
 
     var svg = d3.select("#nodeDiagram").append("svg")
         .attr("width", diameter)
@@ -157,9 +217,7 @@ $(function(){
       .append("g")
         .attr("transform", "translate(" + diameter / 2 + "," + diameter / 2 + ")");
 
-    d3.json("data.json", function(error, root) {
-      if (error) return console.error(error);
-
+      var root = { name: "eddaJson", children: eddaJson }; //create the root data object
       var focus = root,
           nodes = pack.nodes(root),
           view;
@@ -177,12 +235,12 @@ $(function(){
           .attr("class", "label")
           .style("fill-opacity", function(d) { return d.parent === root ? 1 : 0; })
           .style("display", function(d) { return d.parent === root ? null : "none"; })
-          .text(function(d) { return d.name; });
+          .text(function(d) { return d.instanceId; });
 
       var node = svg.selectAll("circle.node,text")
 
       var nodeLeaf = svg.selectAll(".node--leaf,text")
-        .on("mouseover", function(d){ $("#detailName").html("Name: " + d.name); });
+        .on("mouseover", function(d){ $("#detailName").html("InstanceID: " + d.instanceId + "<br>Image ID: " + d.imageId); });
 
 
       d3.select("svg")
@@ -213,7 +271,6 @@ $(function(){
         node.attr("transform", function(d) { return "translate(" + (d.x - v[0]) * k + "," + (d.y - v[1]) * k + ")"; });
         circle.attr("r", function(d) { return d.r * k; });
       }
-    });
 
     d3.select(self.frameElement).style("height", diameter + "px");
 
@@ -223,7 +280,11 @@ $(function(){
         - Include Underscore / lodash in the dependencies so we can actually navigate the nodes
         - Take a look at possible navigation / slicing options that redraw based on selection
     */
-});
+}
+
+$(function(){
+    // drawDiagram();
+})
 
 
 </script>
