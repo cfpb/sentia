@@ -20,11 +20,11 @@ This requires Python 2.6+ and Fabric libraries. This has been tested with Elasti
 ## Usage
 
 There are two ways to use this software.
-  1. With Fabric
+  - With Fabric
 ```
 fab -H <host machine ip> -u <user name>  -f fab_push.py  task:elasticurl=<ip address & port of elasticsearch>
 ```
-  2. Without Fabric
+  - Without Fabric
 
 Put get_installed_software.py on the machine you want to collect the information from. The run
 ```
