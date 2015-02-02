@@ -26,7 +26,7 @@ fab -H <host machine ip> -u <user name>  -f fab_push.py  task:elasticurl=<ip add
 ```
   - Without Fabric
 
-Put get_installed_software.py on the machine you want to collect the information from. The run
+Put get_installed_software.py on the machine you want to collect the information from. Then run
 ```
 python get_installed_software.py <ip address & port of elasticsearch>
 ```
