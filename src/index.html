@@ -101,12 +101,9 @@
                 </div>
             </div>
             <div id="nodeDiagram"></div>
-            <div id="nodeDetails">
-                <div class="detail-content">
-                    <h6 id="detailName"></h6>Here is some content.<br>And some more content...
-                </div>
-            </div>
-
+            <div id="instanceDetails">
+              <!-- This is where instance Details will be drawn dynamically based on the instanceFields list -->
+            </div>         
         </div><!-- END .content_main -->
     </div>
 </main>
@@ -131,7 +128,26 @@
 <script src="/static/js/main.min.js"></script>
 <script>
 
-var eddaData;
+var eddaData, instanceFields = [], globalRootDebug, globalPackDebug;
+
+// Set the fields we'd like to pull back for each instance in the detail view - single global to update all this stuff 
+// that will dynamically create the details table with all the correct fields and query the values properly from Edda on Mouseover
+instanceFields = [ {key: "state", label: "State:" }, {key: "instanceType", label: "Instance Type:"}, 
+                    {key: "privateDnsName", label: "Private DNS Name:"}, {key: "privateIpAddress", label: "Private IP Address:"},
+                    {key: "subnetId", label: "Subnet ID:"},{key: "vpcId", label: "VPC ID:"},{ key: "tags", label: "Tags:"},
+                    {key: "securityGroups", label: "Security Groups:"},
+                    {key: "rootDeviceName", label: "Root Device Name:"} ];
+
+// Draw the Details Table
+function drawDetailsContainer(){
+    var htmlContent = '';
+    for( i in instanceFields){
+        var val = instanceFields[i]; 
+        htmlContent += '<div class="detail-row"><div class="detail-name"><h6>' + val.label + '</h6></div><div class="detail-value" data-key="' + val.key + '"></div></div>';
+    }
+    console.log("htmlContent: ", htmlContent);
+    $("#instanceDetails").append(htmlContent);
+}
 
 function createEndpoint(params){
     if(typeof params.collection === 'undefined' || typeof params.subject === 'undefined' || typeof params.query === 'undefined'){
@@ -140,35 +156,63 @@ function createEndpoint(params){
     return serverURL + '/edda/api/v2/' + params.collection + '/' + params.subject + '/' + params.query;
 }
 
-function getData(endpoint, params){
-    var request = $.ajax({
+function getData(endpoint){
+    return $.ajax({
         dataType: 'jsonp',
         jsonpCallback: 'eddaResponse',
         url: endpoint,
         success: console.log('Edda get successful!')
-    });
-    request.fail( function( status ){
-        console.log( 'no data was available at' + endpoint + '. status: ' + status );
-    });
-    request.done(function( status ){
-        console.log( "Done!" );
-    });
-    request.complete( function( status ){
-        console.log( "Complete" );
-    });        
+    }).fail( function(status){ console.log( "Edda get failed with status: ", status) } );    
 }
 
 function eddaResponse(data){
+    console.log("Running Edda Response");
     eddaData = { key: "Enclave", values: data };
 }
 
 
 
-function buildPage( dataFunctions ){
+function buildPage(){
+    // This should be better parameterized...
     // When a filter is applied, requery everything and redraw the diagram
-    $.when( dataFunctions ).done(function( results ){
-        console.log("results: ", results);
+    $.when( getData( serverUrl + 'edda/api/v2/view/instances;_expand;_callback=eddaResponse', '') ).done( function(){
+        drawDiagram(eddaData);
+        drawDetailsContainer();
     });
+}
+
+function drawInstanceDetails(d){
+    // For each key in each object, write to the page
+    for(i in instanceFields){
+        var valKey = instanceFields[i].key,
+            dataVal = d[valKey],
+            detailContent = dataVal;
+
+        console.log("DataVal: ", dataVal);
+        switch(valKey){
+            case "tags":
+                detailContent = "";
+                for( j in dataVal ){
+                    detailContent += "<div class='object-name'>" + dataVal[j].key + ": </div><div class='object-detail'>" + dataVal[j].value + "</div>";
+                }
+                break;
+            case "securityGroups":
+                detailContent = "";
+                for( j in dataVal ){
+                    detailContent += dataVal[j].groupName + "<br/>";
+                }
+                break;
+            case "state":
+                detailContent = "";
+                detailContent = dataVal.name;
+                break;
+            default:
+
+                break;
+        }
+
+        $("div[data-key=" + valKey +"]").html(detailContent);
+    }
 }
 
 /* 
@@ -188,10 +232,42 @@ function getCircleSize(instType){
     }
 }
 
+// Determine the class that should be assigned to a node as drawn in D3.
+// This will fix hierarchy labeling and coloration issues.
+function getNodeClass( d ){
+    var nodeClass = d.parent ? d.children ? "node" : "node node--leaf" : "node node--root";
+    var keyVal = d.key;
+
+    if ( typeof keyVal === 'undefined'){
+        keyVal = "instance";
+    } else if ( keyVal.indexOf("vpc") >= 0 ){
+        keyVal = "vpc";
+    } else if ( keyVal.indexOf("subnet") >= 0 ){
+        keyVal = "subnet";
+    } else {
+        keyVal = "other";
+    }
+
+    return nodeClass + " " + keyVal;
+}
+
+function getInstanceColor( d ){
+    switch(d.state.name){
+        case "running":
+            return "#ADDC91";
+            break;
+        case "stopped":
+            return "#E8A091";
+            break;
+        default:
+            return null;
+    }
+}
+
 function drawDiagram( eddaJson ){
     // Example borrowed from Mike Bostock's Awesome Zoomable Circle Packing: http://bl.ocks.org/mbostock/7607535
     var margin = 20,
-        diameter = 700; // TODO: Make this be 75% of the page width
+        diameter = 600; // TODO: Make this be 75% of the page width
         // diameter = window.innerHeight ||
         //          html.clientHeight  ||
         //          body.clientHeight  ||
@@ -199,7 +275,7 @@ function drawDiagram( eddaJson ){
 
     var color = d3.scale.linear()
         .domain([-1, 5])
-        .range(["hsl(152,80%,80%)", "hsl(228,30%,40%)"])
+        .range(["#E3E4E5","#75787B"])
         .interpolate(d3.interpolateHcl);
 
     var pack = d3.layout.pack()
@@ -221,6 +297,9 @@ function drawDiagram( eddaJson ){
             .key(function(d) { return d.subnetId })
             .entries( eddaJson.values )
             }; //create the root data object
+
+    // GLOBAL DEBUG VAR - DELETE LATER
+    globalRootDebug = rootData;
     
     var root = rootData;
             
@@ -240,13 +319,16 @@ function drawDiagram( eddaJson ){
           nodes = pack.nodes(root),
           view;
 
+          // DEBUG VARIABLE - DELETE LATER
+        globalPackDebug = nodes;
+
           console.log("Nodes: ", nodes);
       var circle = svg.selectAll("circle")
         .data(nodes)
         .enter().append("circle")
-          .attr("class", function(d) { return d.parent ? d.children ? "node" : "node node--leaf" : "node node--root"; })
-          .attr("data-identifier", function(d) { return d.key ? d.instanceId : "NO INFO"; })
-          .style("fill", function(d) { return d.children ? color(d.depth) : null; })
+          .attr("class", function(d) { return getNodeClass(d); })
+          .attr("data-identifier", function(d) { return d.key ? d.privateIpAddress : "NO INFO"; })
+          .style("fill", function(d) { return d.children ? color(d.depth) : getInstanceColor(d); })
           .on("click", function(d) { if (focus !== d) zoom(d), d3.event.stopPropagation(); });
 
       var text = svg.selectAll("text")
@@ -257,7 +339,7 @@ function drawDiagram( eddaJson ){
           .style("display", function(d) { return d.parent === root ? null : "none"; })
           .text(function(d) {
             if( typeof d.key === "undefined"){
-                return d.privateDnsName;
+                return d.privateIpAddress;
             } else {
                 return d.key;
             }
@@ -266,8 +348,7 @@ function drawDiagram( eddaJson ){
       var node = svg.selectAll("circle.node,text")
 
       var nodeLeaf = svg.selectAll(".node--leaf,text")
-        .on("mouseover", function(d){ $("#detailName").html("InstanceID: " + d.instanceId + "<br>Image ID: " + d.imageId); });
-
+        .on("mouseover", function(d){ return drawInstanceDetails(d); });
 
       d3.select("svg")
           .style("background", color(-1))
@@ -303,13 +384,17 @@ function drawDiagram( eddaJson ){
     /* TODO:
         - Remove node--leaf from selector for zoom potential
         - Find some colors that work better for AWS instances - assign classes for subnets once you get API access
-        - Include Underscore / lodash in the dependencies so we can actually navigate the nodes
-        - Take a look at possible navigation / slicing options that redraw based on selection
+        - Include Underscore in the dependencies so we can actually navigate the nodes
+        - Add filter capability (Tag Name, etc)
+        - Details about security groups for each instance, then ability to click link and highlight all of those in same SG
+        - Fuzzy Search across the whole object (with filter for D3 on terms)
+        - Link sharing capability for a specific instance?
+        - Tabular view that adapts to the filters
     */
 }
 
 $(function(){
-    // drawDiagram();
+    buildPage();
 })
 
 
