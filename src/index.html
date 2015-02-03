@@ -5,47 +5,14 @@
 <!--[if gt IE 8]><!--> <html lang="en" class="no-js"> <!--<![endif]-->
 
 <head>
-
-<!--
-    ===========
-    GLOBAL META
-    ===========
--->
-
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-<!--
-    ==================
-    PAGE-SPECIFIC META
-    ==================
--->
-
     <title>Sentia - Enlightenment for your Environment</title>
     <meta name="description" content="Netflix Edda Visualization">
 
-<!--
-    ======
-    STYLES
-    ======
-    The number of stylesheets here must be kept to a minimum.
-    Unless adding a significant amount of CSS that is specific to a single page
-    or section of the site, all new styles should be added to src/static/css/app.less.
--->
-
 <!--[if lt IE 9]>      <link rel="stylesheet" href="/static/css/main.ie.min.css"> <![endif]-->
 <!--[if gt IE 8]><!--> <link rel="stylesheet" href="/static/css/main.min.css"> <!--<![endif]-->
-
-<!--
-    ============
-    HEAD SCRIPTS
-    ============
-    The following scripts must be included in the head. DO NOT ADD ANY MORE.
-    All other scripts should go before the closing body tag.
-    If you come across a script that makes a convincing case to be included in
-    the head, then file an issue or PR to discuss including it.
--->
 
 <!--[if lt IE 9]>
     <script src="/static/vendor/html5shiv/html5shiv-printshiv.min.js"></script>
@@ -60,12 +27,6 @@
 </head>
 
 <body>
-
-<!--
-    =================
-    Begin page source
-    =================
--->
 
 <header class="wrapper wrapper__match-content" role="banner">
     <div class="block block__sub">
@@ -115,14 +76,6 @@
 
 </footer>
 
-<!--
-    ============
-    BODY SCRIPTS
-    ============
-    The number of scripts here must be kept to a minimum.
-    Unless adding a significant amount of JS that is specific to a single page
-    or section of the site, all custom JS should be added to src/static/js/app.js.
--->
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="/local/localVars.js"></script>
 <script src="/static/js/main.min.js"></script>
@@ -145,7 +98,6 @@ function drawDetailsContainer(){
         var val = instanceFields[i]; 
         htmlContent += '<div class="detail-row"><div class="detail-name"><h6>' + val.label + '</h6></div><div class="detail-value" data-key="' + val.key + '"></div></div>';
     }
-    console.log("htmlContent: ", htmlContent);
     $("#instanceDetails").append(htmlContent);
 }
 
@@ -166,7 +118,6 @@ function getData(endpoint){
 }
 
 function eddaResponse(data){
-    console.log("Running Edda Response");
     eddaData = { key: "Enclave", values: data };
 }
 
@@ -188,7 +139,6 @@ function drawInstanceDetails(d){
             dataVal = d[valKey],
             detailContent = dataVal;
 
-        console.log("DataVal: ", dataVal);
         switch(valKey){
             case "tags":
                 detailContent = "";
@@ -290,7 +240,6 @@ function drawDiagram( eddaJson ){
       .append("g")
         .attr("transform", "translate(" + diameter / 2 + "," + diameter / 2 + ")");
         
-    console.log("Edda JSON: ", eddaJson);
     
     var rootData = {key: "Enclave", values: d3.nest()
             .key(function(d) { return d.vpcId })
@@ -305,24 +254,13 @@ function drawDiagram( eddaJson ){
             
     console.log("EddaJson as Root Data: ", root);
 
-        // var map = {
-        //     name: "key",
-        //     children: "value"
-        // }            
+    var focus = root,
+      nodes = pack.nodes(root),
+      view;
 
-        // _.each(eddaJson.children function(value, key){
-        //     key = map[key] || key;
-        //     b[key] = value;
-        // });
+      // DEBUG VARIABLE - DELETE LATER
+    globalPackDebug = nodes;
 
-        var focus = root,
-          nodes = pack.nodes(root),
-          view;
-
-          // DEBUG VARIABLE - DELETE LATER
-        globalPackDebug = nodes;
-
-          console.log("Nodes: ", nodes);
       var circle = svg.selectAll("circle")
         .data(nodes)
         .enter().append("circle")
@@ -381,16 +319,6 @@ function drawDiagram( eddaJson ){
 
     d3.select(self.frameElement).style("height", diameter + "px");
 
-    /* TODO:
-        - Remove node--leaf from selector for zoom potential
-        - Find some colors that work better for AWS instances - assign classes for subnets once you get API access
-        - Include Underscore in the dependencies so we can actually navigate the nodes
-        - Add filter capability (Tag Name, etc)
-        - Details about security groups for each instance, then ability to click link and highlight all of those in same SG
-        - Fuzzy Search across the whole object (with filter for D3 on terms)
-        - Link sharing capability for a specific instance?
-        - Tabular view that adapts to the filters
-    */
 }
 
 $(function(){
