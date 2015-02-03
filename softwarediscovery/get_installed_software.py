@@ -4,8 +4,17 @@ import operator
 import json
 from time import gmtime, strftime
 import hashlib
-import subprocess
 
+
+
+
+def is_json(test_json):
+  try:
+    json_object = json.loads(test_json)
+  except ValueError, e:
+    print str(e)
+    return False
+  return True
 
 def get_pip_packages():
 
@@ -33,6 +42,7 @@ master_json = '{'\
               '  "host_name" : "$host_name",  ' \
               '  "ip_address" : "$ip_address",  ' \
               '  "date_created": "$date",  ' \
+              '  "iptables" : $iptables , ' \
               '  "python_libraries" :  {$python_libraries }, ' \
               '  "processes" : $processes , ' \
               '  "yum_installed" : $yum ' \
@@ -42,6 +52,11 @@ master_json = str(master_json)
 
 #add gmt time
 master_json = master_json.replace("$date", strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime()) )
+
+
+
+
+
 
 #get host name
 p = Popen("hostname ", shell=True, stdout=PIPE)
@@ -66,14 +81,14 @@ python_installed = get_pip_packages()
 #call each virtualenv and figure out what python libaries are installed
 p = Popen("source $(which virtualenvwrapper.sh) && lsvirtualenv -b  ", shell=True, stdout=PIPE)
 
-list = p.stdout.read().splitlines()
+_list = p.stdout.read().splitlines()
 
 json_pattern = '"$virtualenvName" : $list '
 
 virtualenvs_json_list = []
 
 
-for v in list:
+for v in _list:
     #print( "Virtualenv: " + v)
     cmd = "source $(which virtualenvwrapper.sh) ; workon " + v + " ; lssitepackages"
     p = Popen(cmd, shell=True, stdout=PIPE)
@@ -120,10 +135,30 @@ json_temp = json_temp.replace("     ","  ")
 
 master_json = master_json.replace("$yum", json_temp )
 
+
+
+
+#get iptables
+p = Popen("sudo iptables -L -v -n", shell=True, stdout=PIPE)
+
+temp_iptables = p.stdout.read().splitlines()
+json_temp = json.dumps(temp_iptables)
+
+json_temp = json_temp.replace("'","")
+
+
+master_json = master_json.replace("$iptables", json_temp )
+
+
+
+
+print "valide json:" + str(is_json(master_json))
+
+
 #post to elasticsearch
 
 if elasticsearch_url != None:
-    run_curl = "curl -XPUT %s/installedsoftware/%s/%s -d" % (elasticsearch_url,host_name , _id)
+    run_curl = "curl -XPUT %s/installedsoftware/%s/%s -d " % (elasticsearch_url,host_name , _id)
     print run_curl
     json = "' %s '" % master_json
 

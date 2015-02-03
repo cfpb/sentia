@@ -19,7 +19,7 @@ This requires Python 2.6+ and Fabric libraries. This has been tested with Elasti
 
 ## Usage
 
-There are two ways to use this software.
+There are 3 ways to use this software.
   - With Fabric
 ```
 fab -H <host machine ip> -u <user name>  -f fab_push.py  task:elasticurl=<ip address & port of elasticsearch>
@@ -30,6 +30,16 @@ Put get_installed_software.py on the machine you want to collect the information
 ```
 python get_installed_software.py <ip address & port of elasticsearch>
 ```
+
+ -With Fabric and list of IPAddresses from an EDDA Server
+```
+ python fab_push.py <ip address & port of elasticsearch> <ip address & port of EDDA> <username used to SSH> <key_filename:path_to_ssh_key>
+
+ or without key_filename add:
+ key_filename:none
+```
+
+
 
 
 *note not include elasticurl argument will just print out the software information in json format
