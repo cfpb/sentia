@@ -14,7 +14,8 @@ def process_all(argv):
     machine_user = argv[3]
 
     if argv[4] != "key_filename:none":
-      filename = argv[4]
+      filename = argv[4].split(":")[1]
+      print "Key_FileName: " + filename
     else:
       filename = None
 
