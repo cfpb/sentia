@@ -2,7 +2,7 @@
 <!--[if lt IE 7]>      <html lang="en" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>         <html lang="en" class="no-js lt-ie9 lt-ie8"> <![endif]-->
 <!--[if IE 8]>         <html lang="en" class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!--> <html lang="en" class="no-js"> <!--<![endif]-->
+<!--[if gt IE 8]><!--> <html lang="en" class="no-js" ng-app="sentiaApp"> <!--<![endif]-->
 
 <head>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -23,6 +23,10 @@
         var docElement = document.documentElement;
         docElement.className = docElement.className.replace(/(^|\s)no-js(\s|$)/, '$1$2');
     </script>
+    <script src="/local/localVars.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.11/angular.min.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="/static/js/app.js"></script>
 
 </head>
 
@@ -35,7 +39,7 @@
     </div>
 </header>
 
-<main class="content" id="main" role="main">
+<main class="content" id="main" role="main" >
     <div class="content_bar"></div>
     <div class="content_wrapper">
         <div class="content_main">
@@ -61,12 +65,18 @@
                     <p>EDDA FILTERS TBD, including slider.</p>
                 </div>
             </div>
-            <div id="nodeDiagram"></div>
-            <div id="instanceDetails">
-              <!-- This is where instance Details will be drawn dynamically based on the instanceFields list -->
-            </div>         
+            <div ng-controller="sentiaAppCtrl">
+                <network-visual val="eddaData" fields="fields"></network-visual>
+                <div id="instanceDetails" >
+                    <div class='detail-row' ng-repeat="field in fields">
+                        <div class='detail-name'><h6>{{field.label}}</h6></div>
+                        <div class='detail-value' data-fieldkey="{{field.key}}" ng-bind-html="renderHtml(field.value)"></div>
+                    </div>
+                </div>   
+            </div>        
         </div><!-- END .content_main -->
     </div>
+  
 </main>
 
 <footer role="contentinfo" class="content_main">
@@ -75,258 +85,5 @@
             <p>Brought to you by the Technology &amp; Innovation Team. </p>
 
 </footer>
-
-<script src="http://d3js.org/d3.v3.min.js"></script>
-<script src="/local/localVars.js"></script>
-<script src="/static/js/main.min.js"></script>
-<script>
-
-var eddaData, instanceFields = [], globalRootDebug, globalPackDebug;
-
-// Set the fields we'd like to pull back for each instance in the detail view - single global to update all this stuff 
-// that will dynamically create the details table with all the correct fields and query the values properly from Edda on Mouseover
-instanceFields = [ {key: "state", label: "State:" }, {key: "instanceType", label: "Instance Type:"}, 
-                    {key: "privateDnsName", label: "Private DNS Name:"}, {key: "privateIpAddress", label: "Private IP Address:"},
-                    {key: "subnetId", label: "Subnet ID:"},{key: "vpcId", label: "VPC ID:"},{ key: "tags", label: "Tags:"},
-                    {key: "securityGroups", label: "Security Groups:"},
-                    {key: "rootDeviceName", label: "Root Device Name:"} ];
-
-// Draw the Details Table
-function drawDetailsContainer(){
-    var htmlContent = '';
-    for( i in instanceFields){
-        var val = instanceFields[i]; 
-        htmlContent += '<div class="detail-row"><div class="detail-name"><h6>' + val.label + '</h6></div><div class="detail-value" data-key="' + val.key + '"></div></div>';
-    }
-    $("#instanceDetails").append(htmlContent);
-}
-
-function createEndpoint(params){
-    if(typeof params.collection === 'undefined' || typeof params.subject === 'undefined' || typeof params.query === 'undefined'){
-        return console.log("Error - insufficient query parameters");
-    }
-    return serverURL + '/edda/api/v2/' + params.collection + '/' + params.subject + '/' + params.query;
-}
-
-function getData(endpoint){
-    return $.ajax({
-        dataType: 'jsonp',
-        jsonpCallback: 'eddaResponse',
-        url: endpoint,
-        success: console.log('Edda get successful!')
-    }).fail( function(status){ console.log( "Edda get failed with status: ", status) } );    
-}
-
-function eddaResponse(data){
-    eddaData = { key: "Enclave", values: data };
-}
-
-
-
-function buildPage(){
-    // This should be better parameterized...
-    // When a filter is applied, requery everything and redraw the diagram
-    $.when( getData( serverUrl + 'edda/api/v2/view/instances;_expand;_callback=eddaResponse', '') ).done( function(){
-        drawDiagram(eddaData);
-        drawDetailsContainer();
-    });
-}
-
-function drawInstanceDetails(d){
-    // For each key in each object, write to the page
-    for(i in instanceFields){
-        var valKey = instanceFields[i].key,
-            dataVal = d[valKey],
-            detailContent = dataVal;
-
-        switch(valKey){
-            case "tags":
-                detailContent = "";
-                for( j in dataVal ){
-                    detailContent += "<div class='object-name'>" + dataVal[j].key + ": </div><div class='object-detail'>" + dataVal[j].value + "</div>";
-                }
-                break;
-            case "securityGroups":
-                detailContent = "";
-                for( j in dataVal ){
-                    detailContent += dataVal[j].groupName + "<br/>";
-                }
-                break;
-            case "state":
-                detailContent = "";
-                detailContent = dataVal.name;
-                break;
-            default:
-
-                break;
-        }
-
-        $("div[data-key=" + valKey +"]").html(detailContent);
-    }
-}
-
-/* 
-    UTILITY FUNCTIONS  
-*/
-
-function getCircleSize(instType){
-    switch( instType ){
-        case '':
-            return 300;
-            break;
-        case '':
-            return 200;
-            break;        
-        default:
-            return 100;
-    }
-}
-
-// Determine the class that should be assigned to a node as drawn in D3.
-// This will fix hierarchy labeling and coloration issues.
-function getNodeClass( d ){
-    var nodeClass = d.parent ? d.children ? "node" : "node node--leaf" : "node node--root";
-    var keyVal = d.key;
-
-    if ( typeof keyVal === 'undefined'){
-        keyVal = "instance";
-    } else if ( keyVal.indexOf("vpc") >= 0 ){
-        keyVal = "vpc";
-    } else if ( keyVal.indexOf("subnet") >= 0 ){
-        keyVal = "subnet";
-    } else {
-        keyVal = "other";
-    }
-
-    return nodeClass + " " + keyVal;
-}
-
-function getInstanceColor( d ){
-    switch(d.state.name){
-        case "running":
-            return "#ADDC91";
-            break;
-        case "stopped":
-            return "#E8A091";
-            break;
-        default:
-            return null;
-    }
-}
-
-function drawDiagram( eddaJson ){
-    // Example borrowed from Mike Bostock's Awesome Zoomable Circle Packing: http://bl.ocks.org/mbostock/7607535
-    var margin = 20,
-        diameter = 600; // TODO: Make this be 75% of the page width
-        // diameter = window.innerHeight ||
-        //          html.clientHeight  ||
-        //          body.clientHeight  ||
-        //          screen.availHeight;
-
-    var color = d3.scale.linear()
-        .domain([-1, 5])
-        .range(["#E3E4E5","#75787B"])
-        .interpolate(d3.interpolateHcl);
-
-    var pack = d3.layout.pack()
-        .padding(2)
-        .size([diameter - margin, diameter - margin])
-        .value(function(d) { return 500; })
-        .children(function(d){ return d.values });
-
-    var svg = d3.select("#nodeDiagram").append("svg")
-        .attr("width", diameter)
-        .attr("height", diameter)
-      .append("g")
-        .attr("transform", "translate(" + diameter / 2 + "," + diameter / 2 + ")");
-        
-    
-    var rootData = {key: "Enclave", values: d3.nest()
-            .key(function(d) { return d.vpcId })
-            .key(function(d) { return d.subnetId })
-            .entries( eddaJson.values )
-            }; //create the root data object
-
-    // GLOBAL DEBUG VAR - DELETE LATER
-    globalRootDebug = rootData;
-    
-    var root = rootData;
-            
-    console.log("EddaJson as Root Data: ", root);
-
-    var focus = root,
-      nodes = pack.nodes(root),
-      view;
-
-      // DEBUG VARIABLE - DELETE LATER
-    globalPackDebug = nodes;
-
-      var circle = svg.selectAll("circle")
-        .data(nodes)
-        .enter().append("circle")
-          .attr("class", function(d) { return getNodeClass(d); })
-          .attr("data-identifier", function(d) { return d.key ? d.privateIpAddress : "NO INFO"; })
-          .style("fill", function(d) { return d.children ? color(d.depth) : getInstanceColor(d); })
-          .on("click", function(d) { if (focus !== d) zoom(d), d3.event.stopPropagation(); });
-
-      var text = svg.selectAll("text")
-          .data(nodes)
-        .enter().append("text")
-          .attr("class", "label")
-          .style("fill-opacity", function(d) { return d.parent === root ? 1 : 0; })
-          .style("display", function(d) { return d.parent === root ? null : "none"; })
-          .text(function(d) {
-            if( typeof d.key === "undefined"){
-                return d.privateIpAddress;
-            } else {
-                return d.key;
-            }
-        });
-
-      var node = svg.selectAll("circle.node,text")
-
-      var nodeLeaf = svg.selectAll(".node--leaf,text")
-        .on("mouseover", function(d){ return drawInstanceDetails(d); });
-
-      d3.select("svg")
-          .style("background", color(-1))
-          .on("click", function() { zoom(root); });
-
-      zoomTo([root.x, root.y, root.r * 2 + margin]);
-
-      function zoom(d) {
-        var focus0 = focus; focus = d;
-
-        var transition = d3.transition()
-            .duration(d3.event.altKey ? 7500 : 750)
-            .tween("zoom", function(d) {
-              var i = d3.interpolateZoom(view, [focus.x, focus.y, focus.r * 2 + margin]);
-              return function(t) { zoomTo(i(t)); };
-            });
-
-        transition.selectAll("text")
-          .filter(function(d) { return d.parent === focus || this.style.display === "inline"; })
-            .style("fill-opacity", function(d) { return d.parent === focus ? 1 : 0; })
-            .each("start", function(d) { if (d.parent === focus) this.style.display = "inline"; })
-            .each("end", function(d) { if (d.parent !== focus) this.style.display = "none"; });
-      }
-
-      function zoomTo(v) {
-        var k = diameter / v[2]; view = v;
-        node.attr("transform", function(d) { return "translate(" + (d.x - v[0]) * k + "," + (d.y - v[1]) * k + ")"; });
-        circle.attr("r", function(d) { return d.r * k; });
-      }
-
-    d3.select(self.frameElement).style("height", diameter + "px");
-
-}
-
-$(function(){
-    buildPage();
-})
-
-
-</script>
-
 
 </body>

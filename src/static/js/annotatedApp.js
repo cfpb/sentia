@@ -4,7 +4,7 @@ endpoint = serverUrl + "edda/api/v2/view/instances;_expand;_callback=JSON_CALLBA
 
 var sentiaApp = angular.module("sentiaApp", []);
 
-sentiaApp.controller("sentiaAppCtrl", function($scope, DataService, $http, $sce){
+sentiaApp.controller("sentiaAppCtrl", ["$scope", "DataService", "$http", "$sce", function($scope, DataService, $http, $sce){
 	
 	DataService.getThings().then(function(result){
 		$scope.eddaData = { key: "Enclave", values: result};
@@ -20,7 +20,7 @@ sentiaApp.controller("sentiaAppCtrl", function($scope, DataService, $http, $sce)
 	$scope.renderHtml = function(html_code){
 		return $sce.trustAsHtml(html_code);
 	};
-});
+}]);
 
 sentiaApp.service("DataService",["$http","$q",function($http, $q){
   return {

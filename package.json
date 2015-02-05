@@ -5,8 +5,8 @@
   "homepage": "http://sentia.demo.cfpb.gov",
   "author": {
     "name": "Consumer Financial Protection Bureau",
-    "email": "tech@cfpb.gov"  ,
-        "url": "http://consumerfinance.gov" 
+    "email": "tech@cfpb.gov",
+    "url": "http://consumerfinance.gov"
   },
   "license": "CC0",
   "keywords": [
@@ -26,6 +26,7 @@
     "grunt-contrib-uglify": "^0.6.0",
     "grunt-contrib-watch": "~0.6.1",
     "grunt-legacssy": "~0.4.0",
+    "grunt-ng-annotate": "^0.9.2",
     "grunt-string-replace": "~1.0.0",
     "grunt-topdoc": "~0.3.0",
     "load-grunt-tasks": "~1.0.0",

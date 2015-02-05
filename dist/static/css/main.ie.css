@@ -9698,10 +9698,6 @@ figure img {
   text-shadow: 0 1px 0 #ffffff, 1px 0 0 #ffffff, -1px 0 0 #ffffff, 0 -1px 0 #ffffff;
 }
 
-body {
-  background-color: #fff;
-}
-
 .intro-message {
   padding: 1em;
   background: #f1f2f2;
@@ -9944,6 +9940,7 @@ body {
   margin-right: -0.25em;
   vertical-align: top;
   width: 58.33333333%;
+  border-width: 0 5px;
 }
 
 .lt-ie8 #nodeDiagram {
@@ -9964,6 +9961,7 @@ body {
   margin-right: -0.25em;
   vertical-align: top;
   width: 41.66666667%;
+  border-width: 0 5px;
 }
 
 .lt-ie8 #instanceDetails {
@@ -9993,6 +9991,7 @@ body {
   margin-right: -0.25em;
   vertical-align: top;
   width: 41.66666667%;
+  border-width: 0 5px;
 }
 
 .lt-ie8 #instanceDetails .detail-row .detail-name {
@@ -10011,6 +10010,7 @@ body {
   margin-right: -0.25em;
   vertical-align: top;
   width: 58.33333333%;
+  border-width: 0 5px;
   font-size: 12px;
 }
 
@@ -10022,7 +10022,6 @@ body {
 }
 
 #instanceDetails .detail-row .detail-value .object-name {
-  border-width: 0;
   display: inline-block;
   box-sizing: border-box;
   border: solid transparent;
@@ -10030,6 +10029,7 @@ body {
   margin-right: -0.25em;
   vertical-align: top;
   width: 41.66666667%;
+  border-width: 0 5px;
 }
 
 .lt-ie8 #instanceDetails .detail-row .detail-value .object-name {
@@ -10040,7 +10040,6 @@ body {
 }
 
 #instanceDetails .detail-row .detail-value .object-detail {
-  border-width: 0;
   display: inline-block;
   box-sizing: border-box;
   border: solid transparent;
@@ -10048,6 +10047,7 @@ body {
   margin-right: -0.25em;
   vertical-align: top;
   width: 58.33333333%;
+  border-width: 0 5px;
 }
 
 .lt-ie8 #instanceDetails .detail-row .detail-value .object-detail {

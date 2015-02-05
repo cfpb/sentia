@@ -46,6 +46,17 @@ module.exports = function(grunt) {
       }
     },
 
+    /** 
+      ANGULAR ANNOTATION FIX
+    **/
+    ngAnnotate: {
+        sentia: {
+            files: {
+                '<%= loc.src %>/static/js/annotatedApp.js': ['<%= loc.src %>/static/js/app.js']
+            },
+        }
+    },
+
     /**
      * Concat: https://github.com/gruntjs/grunt-contrib-concat
      *
@@ -73,7 +84,6 @@ module.exports = function(grunt) {
         dest: '<%= loc.dist %>/static/js/main.js'
       }
     },
-
     /**
      * Less: https://github.com/gruntjs/grunt-contrib-less
      *
@@ -230,6 +240,15 @@ module.exports = function(grunt) {
           },
           {
             expand: true,
+            cwd: '<%= loc.src %>/static/js',
+            src: [
+              // Javascript files
+              '*.js',
+            ],
+            dest: '<%= loc.dist %>/static/js'
+          },          
+          {
+            expand: true,
             cwd: '<%= loc.src %>/static',
             src: [
               // Fonts
@@ -261,8 +280,8 @@ module.exports = function(grunt) {
     jshint: {
       options: {
         camelcase: false,
-        curly: true,
-        forin: true,
+        curly: false,
+        forin: false,
         immed: true,
         latedef: true,
         newcap: true,
@@ -279,8 +298,8 @@ module.exports = function(grunt) {
           jQuery: true,
           $: true,
           module: true,
-          require: true,
-          define: true,
+          require: false,
+          define: false,
           console: true,
           EventEmitter: true
         }
@@ -311,11 +330,12 @@ module.exports = function(grunt) {
   /**
    * Create custom task aliases and combinations.
    */
+  grunt.loadNpmTasks('grunt-ng-annotate');
   grunt.registerTask('compile-cf', ['bower:cf', 'concat:cf-less']);
   grunt.registerTask('css', ['less', 'autoprefixer', 'legacssy', 'cssmin', 'usebanner:css']);
   grunt.registerTask('js', ['concat:js', 'uglify', 'usebanner:js']);
   grunt.registerTask('test', ['jshint']);
-  grunt.registerTask('build', ['test', 'css', 'js', 'copy']);
+  grunt.registerTask('build', ['test', 'ngAnnotate', 'css', 'js', 'copy']);
   grunt.registerTask('default', ['build']);
 
 };
