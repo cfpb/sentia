@@ -10680,8 +10680,20 @@ var sentiaApp = angular.module("sentiaApp", []);
 sentiaApp.controller("sentiaAppCtrl", function($scope, DataService, $http, $sce){
 	
 	DataService.getThings().then(function(result){
-		$scope.eddaData = { key: "Enclave", values: result};
+		var data = formatResponse(result);
+		$scope.eddaData = { key: "Enclave", values: data };
 	});
+
+	// Handle data formatting here
+	var formatResponse = function (data) {
+		data.forEach(function (datum) {
+			if(typeof datum.state.name !== "undefined"){
+				var state = datum.state.name;
+				datum.state = state;
+			}
+		});
+		return data;
+	};
 
 	$scope.filterObj = {};
 	
@@ -10691,10 +10703,16 @@ sentiaApp.controller("sentiaAppCtrl", function($scope, DataService, $http, $sce)
 							{key: "privateDnsName", label: "Private DNS Name:", value: ""}, {key: "privateIpAddress", label: "Private IP Address:", value: ""},
 							{key: "subnetId", label: "Subnet ID:", value: ""},{key: "vpcId", label: "VPC ID:"},{ key: "tags", label: "Tags:", value: ""},
 							{key: "securityGroups", label: "Security Groups:", value: ""},
-							{key: "rootDeviceName", label: "Root Device Name:", value: ""} ];
+							{key: "rootDeviceName", label: "Root Device Name:", value: ""},
+							{key: "discoveryDetails", label: "Software Details: ", value: "", software: ""  } ];
 	$scope.renderHtml = function(html_code){
 		return $sce.trustAsHtml(html_code);
 	};
+
+	$scope.search = {
+		state: ""
+	};
+
 });
 
 sentiaApp.service("DataService",["$http","$q",function($http, $q){
@@ -10714,8 +10732,42 @@ sentiaApp.service("DataService",["$http","$q",function($http, $q){
   };
 }]);
 
+sentiaApp.directive("serverDetails", function($http) {
+	return {
+	    restrict: "E",
+	    link: function(scope, element, attr) {	    	
+	    	scope.$watchCollection("fields[3]", function (newVal, oldVal) {
+				// if 'val' is undefined, exit
+				console.log("newVal", newVal, "oldVal", oldVal);
+				
+				if (!newVal) {
+					return;
+				}
+
+	            $http.jsonp(discoveryUrl + "installedsoftware/_search?q=ip_address:" + ipAddress + "&callback=JSON_CALLBACK") //+ newVal.privateIpAddress.value 
+	            .success(function(data) {
+	            	var results = data.hits.hits;
+	            	console.log("Discovery Results: ", results);
+	            	// THIS IS A HACK TO GET THE LAST ELASTICSEARCH RESULT - CHANGE THIS.
+	            	var length = results.length - 1;
+	            	console.log("length: ", length);
+	            	var lastResult = results[length];
+	            	console.log("Last result: ", lastResult);
+	            	element.html("Host Name: " + lastResult._source.host_name);
+	            	
+	            	console.log("Discovered Data: ", data);
+	            }).error(function(data, status, headers, config){
+	            	console.log("An error occurred: ", status);
+	            });
+
+	        });
+	    }
+	};
+});
 
 sentiaApp.directive("networkVisual", function(){
+	/* DIRECTIVE CONSTANTS */
+
 	// Example borrowed from Mike Bostock's Awesome Zoomable Circle Packing: http://bl.ocks.org/mbostock/7607535
 	var margin = 20,
 		diameter = 600; // TODO: Make this be 75% of the page width
@@ -10750,10 +10802,6 @@ sentiaApp.directive("networkVisual", function(){
 	                for( var k in dataVal ){
 	                    detailContent += dataVal[k].groupName + "<br/>";
 	                }
-	                break;
-	            case "state":
-	                detailContent = "";
-	                detailContent = dataVal.name;
 	                break;
 	            default:
 
@@ -10802,7 +10850,7 @@ sentiaApp.directive("networkVisual", function(){
 	}
 
 	function getInstanceColor( d ){
-	    switch(d.state.name){
+	    switch(d.state){
 	        case "running":
 	            return "#ADDC91";
 	        case "stopped":
@@ -10812,13 +10860,13 @@ sentiaApp.directive("networkVisual", function(){
 	    }
 	}
 
-	/* THE BIG RETURN */
+	/* THE BIG RETURN FOR THE DIRECTIVE*/
 	return {
 		restrict: "E",
 		scope: {
 			val: "=",
 			fields: "=",
-			dataFilter: "@"
+			dataFilter: "="
 		},
 		link: function(scope, element, attr){
 
@@ -10848,7 +10896,6 @@ sentiaApp.directive("networkVisual", function(){
 							};
 
 				var root = nestedNewVal;
-				console.log("EddaJson as Root Data: ", root);
 
 				var focus = root,
 				nodes = pack.nodes(root);
@@ -10877,15 +10924,10 @@ sentiaApp.directive("networkVisual", function(){
 
 				var node = svg.selectAll("circle.node,text");
 
-				var nodeLeaf = svg.selectAll(".node--leaf,text")
+				var nodeLeaf = svg.selectAll(".node--leaf")
 					.on("mouseover", function(d){ return drawInstanceDetails(d, scope.fields, scope); });
 
-				d3.select("svg")
-					.on("click", function() { scope.apply(function(){zoom(root);}); });
-
 				function zoomTo(v) {
-					console.log("ZoomTo called.");
-					console.log("What is V?: ", v);
 					var k = diameter / v[2]; scope.view = v;
 					node.attr("transform", function(d) { return "translate(" + (d.x - v[0]) * k + "," + (d.y - v[1]) * k + ")"; });
 					circle.attr("r", function(d) { return d.r * k; });
@@ -10894,13 +10936,11 @@ sentiaApp.directive("networkVisual", function(){
 				zoomTo([root.x, root.y, root.r * 2 + margin]);
 
 				function zoom(d) {
-					console.log("Zoom called.");
 					var focus0 = focus; focus = d;
 
 					var transition = d3.transition()
 						.duration(d3.event.altKey ? 7500 : 750)
 						.tween("zoom", function(d) {
-							console.log("What is scope.view?: ", scope.view);
 							var i = d3.interpolateZoom(scope.view, [focus.x, focus.y, focus.r * 2 + margin]);
 							scope.$apply();
 							return function(t) { zoomTo(i(t)); };
@@ -10920,7 +10960,7 @@ sentiaApp.directive("networkVisual", function(){
 
 
 		// END LINK FUNCTION RETURN		
-		scope.$apply( function(){console.log("This is the apply at the end of the Link");});	
+		scope.$apply();	
 		}
 	};
 });

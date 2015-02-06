@@ -75,7 +75,25 @@
                         <div class='detail-name'><h6>{{field.label}}</h6></div>
                         <div class='detail-value' data-fieldkey="{{field.key}}" ng-bind-html="renderHtml(field.value)"></div>
                     </div>
-                </div>   
+                    <div class="discovery-data">
+                        <div class="discovery-header">
+                            <span>
+                                <h6>Server Details</h6>
+                                <server-details></server-details>
+                            </span>
+                        </div>                      
+                    </div>
+                </div>
+                
+                <div>
+                    State: <input ng-model="search.state" type="text"/>
+                <b>COUNT:</b> {{eddaVals.length}}
+                <ul  class="instance-table" ng-repeat="inst in eddaVals = (eddaData.values | filter:{ state: search.state })">
+                    <li>
+                       {{ inst.privateIpAddress }}: {{ inst.state }} 
+                    </li>
+                </ul>   
+                </div>
 
             </div>        
         </div><!-- END .content_main -->

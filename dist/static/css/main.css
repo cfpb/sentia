@@ -9575,6 +9575,9 @@ figure img {
   zoom: 1;
   behavior: url('/static/vendor/box-sizing-polyfill/boxsizing.htc');
 }
+.discovery-data {
+  padding: 5px;
+}
 footer.content_main {
   font-size: .9em;
 }
