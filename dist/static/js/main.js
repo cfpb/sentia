@@ -10852,8 +10852,7 @@ sentiaApp.directive("networkVisual", function(){
 				console.log("EddaJson as Root Data: ", root);
 
 				var focus = root,
-				nodes = pack.nodes(root),
-				view;
+				nodes = pack.nodes(root);
 
 				var circle = svg.selectAll("circle")
 					.data(nodes)
@@ -10861,7 +10860,7 @@ sentiaApp.directive("networkVisual", function(){
 					.attr("class", function(d) { return getNodeClass(d); })
 					.attr("data-identifier", function(d) { return d.key ? d.privateIpAddress : "NO INFO"; })
 					.style("fill", function(d) { return d.children ? color(d.depth) : getInstanceColor(d); })
-					.on("click", function(d) { if (focus !== d){ zoom(d); } else { d3.event.stopPropagation();} });
+					.on("click", function(d) { if (focus !== d){ scope.$apply(function(){zoom(d);}); } else { d3.event.stopPropagation();} });
 
 				var text = svg.selectAll("text")
 					.data(nodes)
@@ -10883,11 +10882,12 @@ sentiaApp.directive("networkVisual", function(){
 					.on("mouseover", function(d){ return drawInstanceDetails(d, scope.fields, scope); });
 
 				d3.select("svg")
-					.on("click", function() { zoom(root); });
+					.on("click", function() { scope.apply(function(){zoom(root);}); });
 
 				function zoomTo(v) {
 					console.log("ZoomTo called.");
-					var k = diameter / v[2]; view = v;
+					console.log("What is V?: ", v);
+					var k = diameter / v[2]; scope.view = v;
 					node.attr("transform", function(d) { return "translate(" + (d.x - v[0]) * k + "," + (d.y - v[1]) * k + ")"; });
 					circle.attr("r", function(d) { return d.r * k; });
 				}
@@ -10901,8 +10901,10 @@ sentiaApp.directive("networkVisual", function(){
 					var transition = d3.transition()
 						.duration(d3.event.altKey ? 7500 : 750)
 						.tween("zoom", function(d) {
-							var i = d3.interpolateZoom(view, [focus.x, focus.y, focus.r * 2 + margin]);
-								return function(t) { zoomTo(i(t)); };
+							console.log("What is scope.view?: ", scope.view);
+							var i = d3.interpolateZoom(scope.view, [focus.x, focus.y, focus.r * 2 + margin]);
+							scope.$apply();
+							return function(t) { zoomTo(i(t)); };
 						});
 
 					transition.selectAll("text")
@@ -10918,7 +10920,8 @@ sentiaApp.directive("networkVisual", function(){
 			// END SCOPE WATCH
 
 
-		// END LINK FUNCTION RETURN			
+		// END LINK FUNCTION RETURN		
+		scope.$apply();	
 		}
 	};
 });
