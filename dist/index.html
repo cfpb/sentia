@@ -42,7 +42,7 @@
 <main class="content" id="main" role="main" >
     <div class="content_bar"></div>
     <div class="content_wrapper">
-        <div class="content_main">
+        <div class="content_main" ng-controller="sentiaAppCtrl">
             <div class="expandable expandable__padded">
                 <a class="expandable_target expandable_header"
                    href="#expandable-padded-content">
@@ -50,29 +50,33 @@
                         Filter
                     </span>
                     <span class="expandable_link expandable_header-right">
-                        <span class="expandable_cue-open">
+                        <span class="expandable_cue-open" ng-show="!filter.expanded" ng-click="filter.expanded = true">
                             Show
                             <span class="cf-icon cf-icon-plus-round"></span>
                         </span>
-                        <span class="expandable_cue-close">
+                        <span class="expandable_cue-close" ng-show="filter.expanded" ng-click="filter.expanded = false">
                             Hide
                             <span class="cf-icon cf-icon-minus-round"></span>
                         </span>
                     </span>
                 </a>
-                <div class="expandable_content" id="expandable-padded-content">
+                <div class="expandable_content" id="expandable-padded-content" ng-show="filter.expanded">
                     <!-- Expandable Content Here -->
                     <p>EDDA FILTERS TBD, including slider.</p>
                 </div>
-            </div>
-            <div ng-controller="sentiaAppCtrl">
-                <network-visual val="eddaData" fields="fields"></network-visual>
+            </div>            
+            <div class="">
+                <div class="">
+
+                </div>
+                <network-visual val="eddaData" fields="fields" dataFilter="filterObj"></network-visual>
                 <div id="instanceDetails" >
                     <div class='detail-row' ng-repeat="field in fields">
                         <div class='detail-name'><h6>{{field.label}}</h6></div>
                         <div class='detail-value' data-fieldkey="{{field.key}}" ng-bind-html="renderHtml(field.value)"></div>
                     </div>
                 </div>   
+
             </div>        
         </div><!-- END .content_main -->
     </div>

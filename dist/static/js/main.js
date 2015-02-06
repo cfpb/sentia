@@ -10682,6 +10682,8 @@ sentiaApp.controller("sentiaAppCtrl", function($scope, DataService, $http, $sce)
 	DataService.getThings().then(function(result){
 		$scope.eddaData = { key: "Enclave", values: result};
 	});
+
+	$scope.filterObj = {};
 	
 	// Set the fields we'd like to pull back for each instance in the detail view - single global to update all this stuff 
 	// that will dynamically create the details table with all the correct fields and query the values properly from Edda on Mouseover
@@ -10714,30 +10716,120 @@ sentiaApp.service("DataService",["$http","$q",function($http, $q){
 
 
 sentiaApp.directive("networkVisual", function(){
+	// Example borrowed from Mike Bostock's Awesome Zoomable Circle Packing: http://bl.ocks.org/mbostock/7607535
+	var margin = 20,
+		diameter = 600; // TODO: Make this be 75% of the page width
+
+	var color = d3.scale.linear()
+		.domain([-1, 5])
+		.range(["#E3E4E5","#75787B"])
+		.interpolate(d3.interpolateHcl);
+	
+	var svg = d3.select("network-visual").append("svg")
+		.attr("width", diameter)
+		.attr("height", diameter)
+		.append("g")
+		.attr("transform", "translate(" + diameter / 2 + "," + diameter / 2 + ")");
+
+	function drawInstanceDetails(d, fields, scope){
+	    // For each key in each object, write to the page
+	    for(var i in fields){
+	        var valKey = fields[i].key,
+	            dataVal = d[valKey],
+	            detailContent = dataVal;
+
+	        switch(valKey){
+	            case "tags":
+	                detailContent = "";
+	                for( var j in dataVal ){
+	                    detailContent +=  dataVal[j].key + ": "+ dataVal[j].value + "<br/>";
+	                }
+	                break;
+	            case "securityGroups":
+	                detailContent = "";
+	                for( var k in dataVal ){
+	                    detailContent += dataVal[k].groupName + "<br/>";
+	                }
+	                break;
+	            case "state":
+	                detailContent = "";
+	                detailContent = dataVal.name;
+	                break;
+	            default:
+
+	                break;
+	        }
+
+	        fields[i].value = detailContent;
+	    }
+        scope.$apply(function(){
+        	console.log("Fields updated in scope apply.");
+        });
+	}
+
+	/* 
+	    UTILITY FUNCTIONS  
+	*/
+
+	function getCircleSize(instType){
+	    switch( instType ){
+	        case "":
+	            return 300;
+	        case "":
+	            return 200;   
+	        default:
+	            return 100;
+	    }
+	}
+
+	// Determine the class that should be assigned to a node as drawn in D3.
+	// This will fix hierarchy labeling and coloration issues.
+	function getNodeClass( d ){
+	    var nodeClass = d.parent ? d.children ? "node" : "node node--leaf" : "node node--root";
+	    var keyVal = d.key;
+
+	    if ( typeof keyVal === "undefined"){
+	        keyVal = "instance";
+	    } else if ( keyVal.indexOf("vpc") >= 0 ){
+	        keyVal = "vpc";
+	    } else if ( keyVal.indexOf("subnet") >= 0 ){
+	        keyVal = "subnet";
+	    } else {
+	        keyVal = "other";
+	    }
+
+	    return nodeClass + " " + keyVal;
+	}
+
+	function getInstanceColor( d ){
+	    switch(d.state.name){
+	        case "running":
+	            return "#ADDC91";
+	        case "stopped":
+	            return "#E8A091";
+	        default:
+	            return null;
+	    }
+	}
+
+	/* THE BIG RETURN */
 	return {
 		restrict: "E",
 		scope: {
 			val: "=",
-			fields: "="
+			fields: "=",
+			dataFilter: "@"
 		},
 		link: function(scope, element, attr){
 
-			console.log("You made it into the directive!!");
-			console.log("Scope at top of Directive: ", scope);
-			// Example borrowed from Mike Bostock's Awesome Zoomable Circle Packing: http://bl.ocks.org/mbostock/7607535
 			var margin = 20,
 				diameter = 600; // TODO: Make this be 75% of the page width
 
-			var color = d3.scale.linear()
-				.domain([-1, 5])
-				.range(["#E3E4E5","#75787B"])
-				.interpolate(d3.interpolateHcl);
-			
-			var svg = d3.select("network-visual").append("svg")
-				.attr("width", diameter)
-				.attr("height", diameter)
-				.append("g")
-				.attr("transform", "translate(" + diameter / 2 + "," + diameter / 2 + ")");
+			var pack = d3.layout.pack()
+				.padding(2)
+				.size([diameter - margin, diameter - margin])
+				.value(function(d) { return 500; })
+				.children(function(d){ return d.values;});
 
 
 			scope.$watch("val", function (newVal, oldVal) {
@@ -10749,15 +10841,7 @@ sentiaApp.directive("networkVisual", function(){
 					return;
 				}
 
-				// console.log("newVal: ", newVal);
-				// console.log("oldVal: ", oldVal);
-				var pack = d3.layout.pack()
-					.padding(2)
-					.size([diameter - margin, diameter - margin])
-					.value(function(d) { return 500; })
-					.children(function(d){ return d.values;});
-
-				var nestedNewVal = { key: "Enclave",
+				nestedNewVal = { key: "Enclave",
 									values: d3.nest()
 										.key(function(d) { return d.vpcId; })
 										.key(function(d) { return d.subnetId; })
@@ -10796,13 +10880,13 @@ sentiaApp.directive("networkVisual", function(){
 				var node = svg.selectAll("circle.node,text");
 
 				var nodeLeaf = svg.selectAll(".node--leaf,text")
-					.on("mouseover", function(d){ return drawInstanceDetails(d, scope.fields); });
+					.on("mouseover", function(d){ return drawInstanceDetails(d, scope.fields, scope); });
 
 				d3.select("svg")
-					.style("background", color(-1))
 					.on("click", function() { zoom(root); });
 
 				function zoomTo(v) {
+					console.log("ZoomTo called.");
 					var k = diameter / v[2]; view = v;
 					node.attr("transform", function(d) { return "translate(" + (d.x - v[0]) * k + "," + (d.y - v[1]) * k + ")"; });
 					circle.attr("r", function(d) { return d.r * k; });
@@ -10811,6 +10895,7 @@ sentiaApp.directive("networkVisual", function(){
 				zoomTo([root.x, root.y, root.r * 2 + margin]);
 
 				function zoom(d) {
+					console.log("Zoom called.");
 					var focus0 = focus; focus = d;
 
 					var transition = d3.transition()
@@ -10832,91 +10917,7 @@ sentiaApp.directive("networkVisual", function(){
 			});
 			// END SCOPE WATCH
 
-			function drawInstanceDetails(d, fields){
-			    // For each key in each object, write to the page
-			    for(var i in fields){
-			        var valKey = fields[i].key,
-			            dataVal = d[valKey],
-			            detailContent = dataVal;
 
-			        console.log("key:", valKey);
-			        console.log("DetailContent: ", detailContent);
-
-			        switch(valKey){
-			            case "tags":
-			                detailContent = "";
-			                for( var j in dataVal ){
-			                    detailContent +=  dataVal[j].key + ": "+ dataVal[j].value + "<br/>";
-			                }
-			                break;
-			            case "securityGroups":
-			                detailContent = "";
-			                for( var k in dataVal ){
-			                    detailContent += dataVal[k].groupName + "<br/>";
-			                }
-			                break;
-			            case "state":
-			                detailContent = "";
-			                detailContent = dataVal.name;
-			                break;
-			            default:
-
-			                break;
-			        }
-
-			        // Write the function that actually writes to the page...
-			        console.log("fields:", fields);
-			        fields[i].value = detailContent;
-			    }
-		        scope.$apply(function(){
-		        	console.log("Fields updated in scope apply.");
-		        });
-			}
-
-			/* 
-			    UTILITY FUNCTIONS  
-			*/
-
-			function getCircleSize(instType){
-			    switch( instType ){
-			        case "":
-			            return 300;
-			        case "":
-			            return 200;   
-			        default:
-			            return 100;
-			    }
-			}
-
-			// Determine the class that should be assigned to a node as drawn in D3.
-			// This will fix hierarchy labeling and coloration issues.
-			function getNodeClass( d ){
-			    var nodeClass = d.parent ? d.children ? "node" : "node node--leaf" : "node node--root";
-			    var keyVal = d.key;
-
-			    if ( typeof keyVal === "undefined"){
-			        keyVal = "instance";
-			    } else if ( keyVal.indexOf("vpc") >= 0 ){
-			        keyVal = "vpc";
-			    } else if ( keyVal.indexOf("subnet") >= 0 ){
-			        keyVal = "subnet";
-			    } else {
-			        keyVal = "other";
-			    }
-
-			    return nodeClass + " " + keyVal;
-			}
-
-			function getInstanceColor( d ){
-			    switch(d.state.name){
-			        case "running":
-			            return "#ADDC91";
-			        case "stopped":
-			            return "#E8A091";
-			        default:
-			            return null;
-			    }
-			}
 		// END LINK FUNCTION RETURN			
 		}
 	};
