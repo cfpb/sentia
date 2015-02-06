@@ -10729,7 +10729,7 @@ sentiaApp.directive("networkVisual", function(){
 		.attr("width", diameter)
 		.attr("height", diameter)
 		.append("g")
-		.attr("transform", "translate(" + diameter / 2 + "," + diameter / 2 + ")");
+		.attr("transform", "translate(" + diameter / 2 + "," + diameter / 2 + ")");	
 
 	function drawInstanceDetails(d, fields, scope){
 	    // For each key in each object, write to the page
@@ -10831,7 +10831,6 @@ sentiaApp.directive("networkVisual", function(){
 				.value(function(d) { return 500; })
 				.children(function(d){ return d.values;});
 
-
 			scope.$watch("val", function (newVal, oldVal) {
 				// Clear all elements inside the directive
 				svg.selectAll("*").remove();
@@ -10921,7 +10920,7 @@ sentiaApp.directive("networkVisual", function(){
 
 
 		// END LINK FUNCTION RETURN		
-		scope.$apply();	
+		scope.$apply( function(){console.log("This is the apply at the end of the Link");});	
 		}
 	};
 });
