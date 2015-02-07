@@ -62,14 +62,22 @@
                 </a>
                 <div class="expandable_content" id="expandable-padded-content" ng-show="filter.expanded">
                     <!-- Expandable Content Here -->
-                    <p>EDDA FILTERS TBD, including slider.</p>
+                    <div>
+                        State: <input ng-model="search.state" type="text"/> Private IP: <input ng-model="search.privateIpAddress" type="text"/>
+                        <b>COUNT:</b> {{eddaVals.length}}
+                        <ul  class="instance-table" ng-repeat="inst in eddaVals = (eddaData.values | filter:{ state: search.state, privateIpAddress: search.privateIpAddress })">
+                            <li>
+                               {{ inst.privateIpAddress }}: {{ inst.state }} 
+                            </li>
+                        </ul>   
+                    </div>
                 </div>
             </div>            
             <div class="">
                 <div class="">
-
+                    Search: <input ng-model="search.eddaString" type="text"/>
                 </div>
-                <network-visual val="eddaData" fields="fields" dataFilter="filterObj"></network-visual>
+                <network-visual val="eddaData" fields="fields" dataFilter="search"></network-visual>
                 <div id="instanceDetails" >
                     <div class='detail-row' ng-repeat="field in fields">
                         <div class='detail-name'><h6>{{field.label}}</h6></div>
@@ -85,15 +93,6 @@
                     </div>
                 </div>
                 
-                <div>
-                    State: <input ng-model="search.state" type="text"/>
-                <b>COUNT:</b> {{eddaVals.length}}
-                <ul  class="instance-table" ng-repeat="inst in eddaVals = (eddaData.values | filter:{ state: search.state })">
-                    <li>
-                       {{ inst.privateIpAddress }}: {{ inst.state }} 
-                    </li>
-                </ul>   
-                </div>
 
             </div>        
         </div><!-- END .content_main -->

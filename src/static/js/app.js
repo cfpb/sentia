@@ -22,22 +22,37 @@ sentiaApp.controller("sentiaAppCtrl", function($scope, DataService, $http, $sce)
 		return data;
 	};
 
+	$scope.discovery = {
+		req_status: false,
+		host_name: "",
+		processes: [],
+		yum_installed: [],
+		python_libraries: {}
+	};
+
 	$scope.filterObj = {};
 	
 	// Set the fields we'd like to pull back for each instance in the detail view - single global to update all this stuff 
 	// that will dynamically create the details table with all the correct fields and query the values properly from Edda on Mouseover
-	$scope.fields = [ {key: "state", label: "State:", value: ""}, {key: "instanceType", label: "Instance Type:", value: ""},
-							{key: "privateDnsName", label: "Private DNS Name:", value: ""}, {key: "privateIpAddress", label: "Private IP Address:", value: ""},
-							{key: "subnetId", label: "Subnet ID:", value: ""},{key: "vpcId", label: "VPC ID:"},{ key: "tags", label: "Tags:", value: ""},
-							{key: "securityGroups", label: "Security Groups:", value: ""},
-							{key: "rootDeviceName", label: "Root Device Name:", value: ""},
-							{key: "discoveryDetails", label: "Software Details: ", value: "", software: ""  } ];
+	$scope.fields = { state: {key: "state", label: "State:", value: ""}, 
+						instanceType: {key: "instanceType", label: "Instance Type:", value: ""},
+						privateDnsName: {key: "privateDnsName", label: "Private DNS Name:", value: ""}, 
+						privateIpAddress: {key: "privateIpAddress", label: "Private IP Address:", value: ""},
+						subnetId: {key: "subnetId", label: "Subnet ID:", value: ""},
+						vpcId: {key: "vpcId", label: "VPC ID:"},
+						tags: {key: "tags", label: "Tags:", value: ""},
+						securityGroups: {key: "securityGroups", label: "Security Groups:", value: ""},
+						rootDeviceName: {key: "rootDeviceName", label: "Root Device Name:", value: ""},
+						discoveryDetails: {key: "discoveryDetails", label: "Software Details: ", value: "", software: ""  } };
+	
 	$scope.renderHtml = function(html_code){
 		return $sce.trustAsHtml(html_code);
 	};
 
 	$scope.search = {
-		state: ""
+		state: "",
+		privateIpAddress: "",
+		eddaString: ""
 	};
 
 });
@@ -59,11 +74,22 @@ sentiaApp.service("DataService",["$http","$q",function($http, $q){
   };
 }]);
 
+//TO DO HERE:
+/* 
+	- Possibly add deferreds to ensure promises kept
+	- Add loading icon and/or property so data not displayed until done loading
+	- OnClick event to load server details instead of mouse-over?
+	- Bind filters to D3 visualization
+	- Merge Subnet data using _ or other data manipulation in cleanup function
+*/
 sentiaApp.directive("serverDetails", function($http) {
 	return {
 	    restrict: "E",
+	    template: 	"<div ng-show='discovery.req_status'><h6>{{ discovery.host_name }}</h6>" + 
+					"<h4>Yum Installed Software</h4>" +
+	    			"<div ng-repeat='proc in discovery.processes'><li>{{ proc }}</li></div></div>",
 	    link: function(scope, element, attr) {	    	
-	    	scope.$watchCollection("fields[3]", function (newVal, oldVal) {
+	    	scope.$watchCollection("fields.privateIpAddress", function (newVal, oldVal) {
 				// if 'val' is undefined, exit
 				console.log("newVal", newVal, "oldVal", oldVal);
 				
@@ -71,20 +97,36 @@ sentiaApp.directive("serverDetails", function($http) {
 					return;
 				}
 
-	            $http.jsonp(discoveryUrl + "installedsoftware/_search?q=ip_address:" + ipAddress + "&callback=JSON_CALLBACK") //+ newVal.privateIpAddress.value 
-	            .success(function(data) {
-	            	var results = data.hits.hits;
-	            	console.log("Discovery Results: ", results);
-	            	// THIS IS A HACK TO GET THE LAST ELASTICSEARCH RESULT - CHANGE THIS.
-	            	var length = results.length - 1;
-	            	console.log("length: ", length);
-	            	var lastResult = results[length];
-	            	console.log("Last result: ", lastResult);
-	            	element.html("Host Name: " + lastResult._source.host_name);
+				var ip = newVal.value,
+					elasticEndpoint = discoveryUrl + "installedsoftware/_search?q=ip_address:" + ip + "&callback=JSON_CALLBACK";
+				
+				console.log("IP: ", ip);
+				console.log("Endpoint: ", elasticEndpoint);
+
+	            $http.jsonp(elasticEndpoint).success(function(data) {
+	            	// shorthand time-saver
+	            	var disc = scope.discovery;
+	            	console.log("Discovery Data: ", data);
+	            	if(data.hits.hits.length < 1){
+	            		disc.req_status = false;
+	            		// disc.yum_installed = [];
+	            		// disc.processes = [];
+
+	            	} else {
+						var results = data.hits.hits;
+		            	console.log("Discovery Results: ", results);
+		            	// // THIS IS A HACK TO GET THE LAST ELASTICSEARCH RESULT - CHANGE THIS SO A SINGLE RESULT COMES BACK
+		            	var length = results.length - 1;
+		            	var lastResult = results[length];
+		            	console.log("Last result: ", lastResult);
+		            	disc.yum_installed = lastResult._source.yum_installed;
+		            	disc.processes = lastResult._source.processes;
+		            	// Set scope so expandables work
+		            	disc.req_status = true;
+	            	}
 	            	
-	            	console.log("Discovered Data: ", data);
 	            }).error(function(data, status, headers, config){
-	            	console.log("An error occurred: ", status);
+	            	console.log("An error occurred with your ES query: ", status);
 	            });
 
 	        });
