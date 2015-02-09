@@ -77,6 +77,7 @@ module.exports = function(grunt) {
           '<%= loc.src %>/vendor/underscore/underscore-min.js',
           '<%= loc.src %>/vendor/jquery.easing/jquery.easing.js',
           '<%= loc.src %>/vendor/cf-*/*.js',
+          '<%= loc.src %>/vendor/d3-tip/index.js',
           // '<%= loc.src %>/vendor/d3/d3.min.js',
           '!<%= loc.src %>/vendor/cf-*/Gruntfile.js',
           '<%= loc.src %>/static/js/app.js'
@@ -252,10 +253,11 @@ module.exports = function(grunt) {
             cwd: '<%= loc.src %>/static',
             src: [
               // Fonts
-              'fonts/*'
+              'fonts/*',
+              'images/*',
             ],
             dest: '<%= loc.dist %>/static'
-          },
+          },         
           {
             expand: true,
             cwd: '<%= loc.src %>',

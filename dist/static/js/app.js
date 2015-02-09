@@ -1,12 +1,12 @@
 var globalRootDebug, globalPackDebug, endpoint;
 
-endpoint = serverUrl + "edda/api/v2/view/instances;_expand;_callback=JSON_CALLBACK";
-
 var sentiaApp = angular.module("sentiaApp", []);
 
 sentiaApp.controller("sentiaAppCtrl", function($scope, DataService, $http, $sce){
 	
-	DataService.getThings().then(function(result){
+	eddaEndpoint = serverUrl + "edda/api/v2/view/instances;_expand;_callback=JSON_CALLBACK";
+
+	DataService.getThings( eddaEndpoint ).then(function(result){
 		var data = formatResponse(result);
 		$scope.eddaData = { key: "Enclave", values: data };
 	});
@@ -22,12 +22,16 @@ sentiaApp.controller("sentiaAppCtrl", function($scope, DataService, $http, $sce)
 		return data;
 	};
 
+	// Loading variable for server discovery data (sets spinner)
+	$scope.loading = 0;
+
 	$scope.discovery = {
 		req_status: false,
 		host_name: "",
 		processes: [],
 		yum_installed: [],
-		python_libraries: {}
+		python_libraries: {},
+		iptables: [],
 	};
 
 	$scope.filterObj = {};
@@ -41,10 +45,9 @@ sentiaApp.controller("sentiaAppCtrl", function($scope, DataService, $http, $sce)
 						subnetId: {key: "subnetId", label: "Subnet ID:", value: ""},
 						vpcId: {key: "vpcId", label: "VPC ID:"},
 						tags: {key: "tags", label: "Tags:", value: ""},
-						securityGroups: {key: "securityGroups", label: "Security Groups:", value: ""},
-						rootDeviceName: {key: "rootDeviceName", label: "Root Device Name:", value: ""},
-						discoveryDetails: {key: "discoveryDetails", label: "Software Details: ", value: "", software: ""  } };
-	
+						securityGroups: {key: "securityGroups", label: "Security Groups:", value: ""}
+					};
+
 	$scope.renderHtml = function(html_code){
 		return $sce.trustAsHtml(html_code);
 	};
@@ -52,14 +55,23 @@ sentiaApp.controller("sentiaAppCtrl", function($scope, DataService, $http, $sce)
 	$scope.search = {
 		state: "",
 		privateIpAddress: "",
-		eddaString: ""
+		eddaString: "",
+		yum: "",
+		python: "",
+		processes: "",
+		iptables: "",
+		instanceType: "",
+		subnetId: "",
+		vpcId: "",
+		tags: "",
+		security: ""
 	};
 
 });
 
 sentiaApp.service("DataService",["$http","$q",function($http, $q){
   return {
-    getThings: function(){
+    getThings: function(endpoint){
         var dfd = $q.defer();
 		$http.jsonp(endpoint)
 		.success(function(data){
@@ -76,18 +88,17 @@ sentiaApp.service("DataService",["$http","$q",function($http, $q){
 
 //TO DO HERE:
 /* 
-	- Possibly add deferreds to ensure promises kept
-	- Add loading icon and/or property so data not displayed until done loading
-	- OnClick event to load server details instead of mouse-over?
+	X Possibly add deferreds to ensure promises kept (now all calls use Data Service)
+	X Add loading icon and/or property so data not displayed until done loading
+	- Make expandables into Tabs
+	X OnClick event to load server details instead of mouse-over?
 	- Bind filters to D3 visualization
 	- Merge Subnet data using _ or other data manipulation in cleanup function
 */
-sentiaApp.directive("serverDetails", function($http) {
+sentiaApp.directive("serverDetails", function(DataService, $http) {
 	return {
 	    restrict: "E",
-	    template: 	"<div ng-show='discovery.req_status'><h6>{{ discovery.host_name }}</h6>" + 
-					"<h4>Yum Installed Software</h4>" +
-	    			"<div ng-repeat='proc in discovery.processes'><li>{{ proc }}</li></div></div>",
+	    templateUrl: "serverDetailsTemplate.html", 	
 	    link: function(scope, element, attr) {	    	
 	    	scope.$watchCollection("fields.privateIpAddress", function (newVal, oldVal) {
 				// if 'val' is undefined, exit
@@ -97,37 +108,46 @@ sentiaApp.directive("serverDetails", function($http) {
 					return;
 				}
 
+				// shorthand time-saver for scope.discovery
+				var disc = scope.discovery;
+
+				disc.req_status = false;
+
 				var ip = newVal.value,
 					elasticEndpoint = discoveryUrl + "installedsoftware/_search?q=ip_address:" + ip + "&callback=JSON_CALLBACK";
 				
 				console.log("IP: ", ip);
 				console.log("Endpoint: ", elasticEndpoint);
 
-	            $http.jsonp(elasticEndpoint).success(function(data) {
-	            	// shorthand time-saver
-	            	var disc = scope.discovery;
-	            	console.log("Discovery Data: ", data);
-	            	if(data.hits.hits.length < 1){
+				// Start loading icon spinning
+				console.log("scope loading: ", scope.loading);
+				scope.loading++;
+				DataService.getThings( elasticEndpoint ).then(function(data){
+					if(data.hits.hits.length < 1){
+						// Decrement Scope Loading and reqest status
+						scope.loading--;
 	            		disc.req_status = false;
-	            		// disc.yum_installed = [];
-	            		// disc.processes = [];
+	            		console.log("No hits for this server.");
 
 	            	} else {
 						var results = data.hits.hits;
 		            	console.log("Discovery Results: ", results);
 		            	// // THIS IS A HACK TO GET THE LAST ELASTICSEARCH RESULT - CHANGE THIS SO A SINGLE RESULT COMES BACK
 		            	var length = results.length - 1;
-		            	var lastResult = results[length];
+		            	var lastResult = results[length]._source;
 		            	console.log("Last result: ", lastResult);
-		            	disc.yum_installed = lastResult._source.yum_installed;
-		            	disc.processes = lastResult._source.processes;
+		            	// END HACK
+
+		            	disc.yum_installed = lastResult.yum_installed;
+		            	disc.python_libraries = lastResult.python_libraries;
+		            	disc.processes = lastResult.processes;
+		            	disc.host_name = lastResult.host_name;
+		            	disc.iptables = lastResult.iptables;
 		            	// Set scope so expandables work
 		            	disc.req_status = true;
+						scope.loading--;
 	            	}
-	            	
-	            }).error(function(data, status, headers, config){
-	            	console.log("An error occurred with your ES query: ", status);
-	            });
+				});
 
 	        });
 	    }
@@ -215,6 +235,13 @@ sentiaApp.directive("networkVisual", function(){
 	        keyVal = "other";
 	    }
 
+	    if ( keyVal === "instance"){
+	    
+		    d.securityGroups.forEach( function (group) {
+		    	keyVal += " " + group.groupName;
+		    });	    	
+	    }
+	   
 	    return nodeClass + " " + keyVal;
 	}
 
@@ -291,10 +318,28 @@ sentiaApp.directive("networkVisual", function(){
 					}
 				});
 
+				var tip = d3.tip()
+				  .attr("class", "d3-tip")
+				  .offset([-10, 0])
+				  .html(function(d) {
+				  	var returnVal;
+					if( typeof d.key === "undefined"){
+						returnVal =  d.privateIpAddress;
+					} else {
+						returnVal = d.key;
+					}
+				    return "<strong>" + returnVal + "</strong>";
+				});					
+
 				var node = svg.selectAll("circle.node,text");
+				
+				var nodeCircles = svg.selectAll("circle.node")
+					.call(tip)
+					.on("mouseover", tip.show)
+  					.on("mouseout", tip.hide);
 
 				var nodeLeaf = svg.selectAll(".node--leaf")
-					.on("mouseover", function(d){ return drawInstanceDetails(d, scope.fields, scope); });
+					.on("click", function(d){ return drawInstanceDetails(d, scope.fields, scope); });
 
 				function zoomTo(v) {
 					var k = diameter / v[2]; scope.view = v;
@@ -333,3 +378,6 @@ sentiaApp.directive("networkVisual", function(){
 		}
 	};
 });
+
+// OTHER UTILITY FUNCTIONS
+

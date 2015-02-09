@@ -9698,6 +9698,64 @@ figure img {
   text-shadow: 0 1px 0 #ffffff, 1px 0 0 #ffffff, -1px 0 0 #ffffff, 0 -1px 0 #ffffff;
 }
 
+.d3-tip {
+  line-height: 1;
+  font-family: "AvenirNextLTW01-Regular", Arial, sans-serif;
+  font-style: normal;
+  font-weight: normal;
+  font-size: .85em;
+  padding: 12px;
+  background: #43484e;
+  color: #fff;
+  border-radius: 2px;
+}
+
+.d3-tip em,
+.d3-tip i {
+  font-family: "AvenirNextLTW01-Italic", Arial, sans-serif;
+  font-style: italic;
+  font-weight: normal;
+}
+
+.lt-ie9 .d3-tip em,
+.lt-ie9 .d3-tip i {
+  font-style: normal !important;
+}
+
+.d3-tip strong,
+.d3-tip b {
+  font-family: "AvenirNextLTW01-Demi", Arial, sans-serif;
+  font-style: normal;
+  font-weight: bold;
+}
+
+.lt-ie9 .d3-tip strong,
+.lt-ie9 .d3-tip b {
+  font-weight: normal !important;
+}
+
+/* Creates a small triangle extender for the tooltip */
+
+.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.8);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
+
+/* Style northward tooltips differently */
+
+.d3-tip.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}
+
 .intro-message {
   padding: 1em;
   background: #f1f2f2;
@@ -10057,8 +10115,101 @@ figure img {
   behavior: url('/static/vendor/box-sizing-polyfill/boxsizing.htc');
 }
 
-.discovery-data {
+sd .discovery-data {
   padding: 5px;
+}
+
+.expandable__padded {
+  margin-bottom: 5px;
+}
+
+.expandable_content {
+  font-size: .85em;
+}
+
+.detail-col-1 {
+  display: inline-block;
+  box-sizing: border-box;
+  border: solid transparent;
+  border-width: 0 15px;
+  margin-right: -0.25em;
+  vertical-align: top;
+  width: 8.33333333%;
+  border-width: 0 5px;
+}
+
+.lt-ie8 .detail-col-1 {
+  display: inline;
+  margin-right: 0;
+  zoom: 1;
+  behavior: url('/static/vendor/box-sizing-polyfill/boxsizing.htc');
+}
+
+.detail-col-2 {
+  display: inline-block;
+  box-sizing: border-box;
+  border: solid transparent;
+  border-width: 0 15px;
+  margin-right: -0.25em;
+  vertical-align: top;
+  width: 16.66666667%;
+  border-width: 0 5px;
+}
+
+.lt-ie8 .detail-col-2 {
+  display: inline;
+  margin-right: 0;
+  zoom: 1;
+  behavior: url('/static/vendor/box-sizing-polyfill/boxsizing.htc');
+}
+
+.detail-col-3 {
+  display: inline-block;
+  box-sizing: border-box;
+  border: solid transparent;
+  border-width: 0 15px;
+  margin-right: -0.25em;
+  vertical-align: top;
+  width: 25%;
+  border-width: 0 5px;
+}
+
+.lt-ie8 .detail-col-3 {
+  display: inline;
+  margin-right: 0;
+  zoom: 1;
+  behavior: url('/static/vendor/box-sizing-polyfill/boxsizing.htc');
+}
+
+.tabular-view {
+  font-size: .9em;
+  font-family: "AvenirNextLTW01-Regular", Arial, sans-serif;
+  font-style: normal;
+  font-weight: normal;
+}
+
+.tabular-view em,
+.tabular-view i {
+  font-family: "AvenirNextLTW01-Italic", Arial, sans-serif;
+  font-style: italic;
+  font-weight: normal;
+}
+
+.lt-ie9 .tabular-view em,
+.lt-ie9 .tabular-view i {
+  font-style: normal !important;
+}
+
+.tabular-view strong,
+.tabular-view b {
+  font-family: "AvenirNextLTW01-Demi", Arial, sans-serif;
+  font-style: normal;
+  font-weight: bold;
+}
+
+.lt-ie9 .tabular-view strong,
+.lt-ie9 .tabular-view b {
+  font-weight: normal !important;
 }
 
 footer.content_main {

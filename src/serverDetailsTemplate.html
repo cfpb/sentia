@@ -1,0 +1,97 @@
+<!-- <div ng-show='loading > 0'><img src="static/images/loadingSpinner.gif"></div> -->
+<div ng-show='discovery.req_status'>
+    <h6>Host Name: {{ discovery.host_name }}</h6>
+    <div class="expandable expandable__padded">
+        <a class="expandable_target expandable_header"
+           href="#expandable-padded-content-yum">
+            <span class="expandable_label expandable_header-left">
+                Installed Packages
+            </span>
+            <span class="expandable_link expandable_header-right">
+                <span class="expandable_cue-open" ng-show="!yumfilter.expanded" ng-click="yumfilter.expanded = true">
+                    Show
+                    <span class="cf-icon cf-icon-plus-round"></span>
+                </span>
+                <span class="expandable_cue-close" ng-show="yumfilter.expanded" ng-click="yumfilter.expanded = false">
+                    Hide
+                    <span class="cf-icon cf-icon-minus-round"></span>
+                </span>
+            </span>
+        </a>
+        <div class="expandable_content" id="expandable-padded-content-yum" ng-show="yumfilter.expanded">
+            Search Installed: <input ng-model="search.yum" type="text"/>
+            <div ng-repeat='yum in discovery.yum_installed | filter:search.yum track by $index '><li>{{ yum }}</li></div>
+        </div>
+    </div>
+    <div class="expandable expandable__padded">
+        <a class="expandable_target expandable_header"
+           href="#expandable-padded-content">
+            <span class="expandable_label expandable_header-left">
+                Processes
+            </span>
+            <span class="expandable_link expandable_header-right">
+                <span class="expandable_cue-open" ng-show="!processes.expanded" ng-click="processes.expanded = true">
+                    Show
+                    <span class="cf-icon cf-icon-plus-round"></span>
+                </span>
+                <span class="expandable_cue-close" ng-show="processes.expanded" ng-click="processes.expanded = false">
+                    Hide
+                    <span class="cf-icon cf-icon-minus-round"></span>
+                </span>
+            </span>
+        </a>
+        <div class="expandable_content" id="expandable-padded-content" ng-show="processes.expanded">
+            Search Processes: <input ng-model="search.processes" type="text"/>
+            <div ng-repeat='proc in discovery.processes | filter:search.processes'><li>{{ proc }}</li></div>
+        </div>
+    </div>
+    <div class="expandable expandable__padded">
+        <a class="expandable_target expandable_header"
+           href="#expandable-padded-content-python">
+            <span class="expandable_label expandable_header-left">
+                Python Packages
+            </span>
+            <span class="expandable_link expandable_header-right">
+                <span class="expandable_cue-open" ng-show="!packages.expanded" ng-click="packages.expanded = true">
+                    Show
+                    <span class="cf-icon cf-icon-plus-round"></span>
+                </span>
+                <span class="expandable_cue-close" ng-show="packages.expanded" ng-click="packages.expanded = false">
+                    Hide
+                    <span class="cf-icon cf-icon-minus-round"></span>
+                </span>
+            </span>
+        </a>
+        <div class="expandable_content" id="expandable-padded-content-python" ng-show="packages.expanded">
+            Search Libraries: <input ng-model="search.python" type="text"/>
+            <div ng-repeat='(key, val) in discovery.python_libraries'>
+                <h6>VirtualEnv Name: {{ key }} </h6>
+                <div ng-repeat='lib in val | filter:search.python'><li>{{ lib }}</li></div>
+            </div>
+        </div>
+    </div>
+    <div class="expandable expandable__padded">
+        <a class="expandable_target expandable_header"
+           href="#expandable-padded-content-python">
+            <span class="expandable_label expandable_header-left">
+                IPTables
+            </span>
+            <span class="expandable_link expandable_header-right">
+                <span class="expandable_cue-open" ng-show="!iptables.expanded" ng-click="iptables.expanded = true">
+                    Show
+                    <span class="cf-icon cf-icon-plus-round"></span>
+                </span>
+                <span class="expandable_cue-close" ng-show="iptables.expanded" ng-click="iptables.expanded = false">
+                    Hide
+                    <span class="cf-icon cf-icon-minus-round"></span>
+                </span>
+            </span>
+        </a>
+        <div class="expandable_content" id="expandable-padded-content-python" ng-show="iptables.expanded">
+            Search IPTables: <input ng-model="search.iptables" type="text"/>
+            <div ng-repeat='iptable in discovery.iptables | filter:search.iptables track by $index'>
+                <li>{{ iptable }}</li>
+            </div>
+        </div>
+    </div>
+</div>
