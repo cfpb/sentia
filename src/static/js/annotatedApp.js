@@ -2,7 +2,7 @@ var globalRootDebug, globalPackDebug, endpoint;
 
 var sentiaApp = angular.module("sentiaApp", []);
 
-sentiaApp.controller("sentiaAppCtrl", function($scope, DataService, $http, $sce){
+sentiaApp.controller("sentiaAppCtrl", ["$scope", "DataService", "$http", "$sce", function($scope, DataService, $http, $sce){
 	
 	eddaEndpoint = serverUrl + "edda/api/v2/view/instances;_expand;_callback=JSON_CALLBACK";
 
@@ -67,7 +67,7 @@ sentiaApp.controller("sentiaAppCtrl", function($scope, DataService, $http, $sce)
 		security: ""
 	};
 
-});
+}]);
 
 sentiaApp.service("DataService",["$http","$q",function($http, $q){
   return {
@@ -95,7 +95,7 @@ sentiaApp.service("DataService",["$http","$q",function($http, $q){
 	- Bind filters to D3 visualization
 	- Merge Subnet data using _ or other data manipulation in cleanup function
 */
-sentiaApp.directive("serverDetails", function(DataService, $http) {
+sentiaApp.directive("serverDetails", ["DataService", "$http", function(DataService, $http) {
 	return {
 	    restrict: "E",
 	    templateUrl: "serverDetailsTemplate.html", 	
@@ -152,7 +152,7 @@ sentiaApp.directive("serverDetails", function(DataService, $http) {
 	        });
 	    }
 	};
-});
+}]);
 
 sentiaApp.directive("networkVisual", function(){
 	/* DIRECTIVE CONSTANTS */
