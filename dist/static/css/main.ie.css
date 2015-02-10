@@ -9684,12 +9684,22 @@ figure img {
 }
 
 .node:hover {
-  stroke: #000;
+  stroke: #43484e;
   stroke-width: 1.5px;
 }
 
 .node--leaf {
   fill: white;
+}
+
+.selected {
+  stroke: #000;
+  stroke-width: 1.5px;
+}
+
+.selectedGroup {
+  stroke: #0072ce;
+  stroke-width: 2px;
 }
 
 .label {
