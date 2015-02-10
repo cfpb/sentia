@@ -9698,8 +9698,7 @@ figure img {
 }
 
 .selectedGroup {
-  stroke: #0072ce;
-  stroke-width: 2px;
+  fill: #0072ce;
 }
 
 .label {

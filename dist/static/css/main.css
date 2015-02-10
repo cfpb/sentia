@@ -9265,8 +9265,7 @@ figure img {
   stroke-width: 1.5px;
 }
 .selectedGroup {
-  stroke: #0072ce;
-  stroke-width: 2px;
+  fill: #0072ce;
 }
 .label {
   font: 12px "Helvetica Neue", Helvetica, Arial, sans-serif;
