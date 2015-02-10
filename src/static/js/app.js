@@ -2,6 +2,7 @@
 /* 
 	X Possibly add deferreds to ensure promises kept (now all calls use Data Service)
 	X Add loading icon and/or property so data not displayed until done loading
+	- Migrate to Angular project structure
 	- Karma / Jasmine Test Suite
 	- Make expandables into Tabs
 	X OnClick event to load server details instead of mouse-over?
@@ -9,6 +10,7 @@
 	- Bind filters to D3 visualization
 	- Merge Subnet data using _ or other data manipulation in cleanup function
 */
+
 var debug;
 
 var sentiaApp = angular.module("sentiaApp", []);
@@ -104,6 +106,7 @@ sentiaApp.service("DataService",["$http","$q",function($http, $q){
   };
 }]);
 
+// Directive to get server specifics of Edda instance (using elasticSearch data)
 sentiaApp.directive("serverDetails", function(DataService, $http) {
 	return {
 	    restrict: "E",
@@ -163,12 +166,13 @@ sentiaApp.directive("serverDetails", function(DataService, $http) {
 	};
 });
 
+// Directive to build packed circles using D3JS
 sentiaApp.directive("networkVisual", function(){
 	/* DIRECTIVE CONSTANTS */
 
 	// Example borrowed from Mike Bostock's Awesome Zoomable Circle Packing: http://bl.ocks.org/mbostock/7607535
 	var margin = 20,
-		diameter = 600; // TODO: Make this be 75% of the page width
+		diameter = 600;
 
 	var color = d3.scale.linear()
 		.domain([-1, 5])
