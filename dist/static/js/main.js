@@ -11176,7 +11176,7 @@ sentiaApp.directive("networkVisual", function(){
 	                detailContent = "";
 	                for( var k in dataVal ){
 	                	var group = dataVal[k].groupName.toString();
-	                    detailContent += "<a ng-click=\"highlightClass('" + group + "')\">" + group + "</a><br/>";
+	                    detailContent += "<a class='security-highlight' data-group='" + group +"'>" + group + "</a><br/>";
 	                }
 	                break;
 	            default:
@@ -11318,6 +11318,8 @@ sentiaApp.directive("networkVisual", function(){
 				  	var returnVal;
 					if( typeof d.key === "undefined"){
 						returnVal =  d.privateIpAddress;
+					} else if( angular.isDefined(friendlyNames[d.key])){
+						returnVal = friendlyNames[d.key] + "<br/>" + d.key;
 					} else {
 						returnVal = d.key;
 					}
@@ -11377,11 +11379,4 @@ sentiaApp.directive("networkVisual", function(){
 	};
 });
 
-// OTHER UTILITY FUNCTIONS
-function highlightClass(className){
-	var full = "." + className;
-	angular.element(".selectedGroup").removeClass("selectedGroup");
-	angular.element(full).addClass(".selectedGroup");
-	
-}
 

@@ -44,7 +44,7 @@
     <div class="content_bar"></div>
     <div class="content_wrapper">
         <div class="content_main" ng-controller="sentiaAppCtrl">
-            <div class="expandable expandable__padded">
+<!--             <div class="expandable expandable__padded">
                 <a class="expandable_target expandable_header"
                    href="#expandable-padded-content">
                     <span class="expandable_label expandable_header-left">
@@ -62,9 +62,9 @@
                     </span>
                 </a>
                 <div class="expandable_content" id="expandable-padded-content" ng-show="filter.expanded">
-                    <!-- Expandable Content Here -->
+
                 </div>
-            </div>            
+            </div>  -->           
             <div class="">
                 <network-visual val="eddaData" fields="fields" dataFilter=""></network-visual>
                 <div id="instanceDetails" >
@@ -86,7 +86,9 @@
                      <!--  BEGIN TABLE CONTENT -->
                 <h2>Tabular View COUNT: {{eddaVals.length}}</h2>
                 <h4>COUNT: {{eddaVals.length}}</h4>
-                Search: <input type="text" ng-model="search.blanket"/>
+                State: <input type="text" ng-model="search.state"/>
+                IP: <input type="text" ng-model="search.privateIpAddress"/>
+                Tags: <input type="text" ng-model="search.tags"/>
                 <table class="compact-table">
                     <thead>
                         <tr>
@@ -99,7 +101,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr ng-repeat="inst in eddaVals = (eddaData.values | filter:{ state: search.blanket })">
+                        <tr ng-repeat="inst in eddaVals = (eddaData.values | filter:{ state: search.state, privateIpAddress: search.privateIpAddress })">
                             <td >
                                {{ inst.privateIpAddress }}
                             </td>
@@ -113,7 +115,7 @@
                                 {{ inst.subnetId }} 
                             </td>
                             <td>
-                                <p ng-repeat="(key, val) in inst.tags">{{ val.key }}: {{ val.value }}</p>
+                                <p ng-repeat="(key, val) in tags = (inst.tags)">{{ val.key }}: {{ val.value }}</p>
                             </td>
                             <td>
                                 <p ng-repeat="group in inst.securityGroups">{{ group.groupName }}</p>
