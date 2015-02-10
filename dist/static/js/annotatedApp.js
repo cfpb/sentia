@@ -1,14 +1,31 @@
-var globalRootDebug, globalPackDebug, endpoint;
+//TO DO HERE:
+/* 
+	X Possibly add deferreds to ensure promises kept (now all calls use Data Service)
+	X Add loading icon and/or property so data not displayed until done loading
+	- Karma / Jasmine Test Suite
+	- Make expandables into Tabs
+	X OnClick event to load server details instead of mouse-over?
+	- Fix JSON nested call issue with filters
+	- Bind filters to D3 visualization
+	- Merge Subnet data using _ or other data manipulation in cleanup function
+*/
+var debug;
 
 var sentiaApp = angular.module("sentiaApp", []);
 
-sentiaApp.controller("sentiaAppCtrl", ["$scope", "DataService", "$http", "$sce", function($scope, DataService, $http, $sce){
+sentiaApp.controller("sentiaAppCtrl", ["$scope", "DataService", "$http", "$q", "$sce", function($scope, DataService, $http, $q, $sce){
 	
-	eddaEndpoint = serverUrl + "edda/api/v2/view/instances;_expand;_callback=JSON_CALLBACK";
+	var eddaEndpoint = serverUrl + "edda/api/v2/view/instances;_expand;_callback=JSON_CALLBACK",
+		subnetEndpoint = serverUrl + "edda/api/v2/aws/subnets;_expand;_callback=JSON_CALLBACK",
+		getEdda = DataService.getThings( eddaEndpoint ),
+		getSubnets = DataService.getThings( subnetEndpoint );
 
-	DataService.getThings( eddaEndpoint ).then(function(result){
-		var data = formatResponse(result);
-		$scope.eddaData = { key: "Enclave", values: data };
+	$q.all([getEdda, getSubnets]).then(function(data){
+		var edda = formatResponse(data[0]);
+		debug = edda;
+		$scope.eddaData = { key: "Enclave", values: angular.copy(edda) };
+		$scope.subnets = data[1];
+		console.log("Data 0: ", data[0], "Data 1: ", data[1]);
 	});
 
 	// Handle data formatting here
@@ -16,7 +33,7 @@ sentiaApp.controller("sentiaAppCtrl", ["$scope", "DataService", "$http", "$sce",
 		data.forEach(function (datum) {
 			if(typeof datum.state.name !== "undefined"){
 				var state = datum.state.name;
-				datum.state = state;
+				datum.state = angular.copy(state);
 			}
 		});
 		return data;
@@ -64,7 +81,8 @@ sentiaApp.controller("sentiaAppCtrl", ["$scope", "DataService", "$http", "$sce",
 		subnetId: "",
 		vpcId: "",
 		tags: "",
-		security: ""
+		security: "",
+		blanket: ""
 	};
 
 }]);
@@ -86,15 +104,6 @@ sentiaApp.service("DataService",["$http","$q",function($http, $q){
   };
 }]);
 
-//TO DO HERE:
-/* 
-	X Possibly add deferreds to ensure promises kept (now all calls use Data Service)
-	X Add loading icon and/or property so data not displayed until done loading
-	- Make expandables into Tabs
-	X OnClick event to load server details instead of mouse-over?
-	- Bind filters to D3 visualization
-	- Merge Subnet data using _ or other data manipulation in cleanup function
-*/
 sentiaApp.directive("serverDetails", ["DataService", "$http", function(DataService, $http) {
 	return {
 	    restrict: "E",
@@ -189,7 +198,8 @@ sentiaApp.directive("networkVisual", function(){
 	            case "securityGroups":
 	                detailContent = "";
 	                for( var k in dataVal ){
-	                    detailContent += dataVal[k].groupName + "<br/>";
+	                	var group = dataVal[k].groupName.toString();
+	                    detailContent += "<a ng-click=\"highlightClass('" + group + "')\">" + group + "</a><br/>";
 	                }
 	                break;
 	            default:
@@ -302,7 +312,9 @@ sentiaApp.directive("networkVisual", function(){
 					.attr("class", function(d) { return getNodeClass(d); })
 					.attr("data-identifier", function(d) { return d.key ? d.privateIpAddress : "NO INFO"; })
 					.style("fill", function(d) { return d.children ? color(d.depth) : getInstanceColor(d); })
-					.on("click", function(d) { if (focus !== d){ scope.$apply(function(){zoom(d);}); } else { d3.event.stopPropagation();} });
+					.on("click", function(d) { 
+						if (focus !== d){ scope.$apply(function(){zoom(d);}); } else { d3.event.stopPropagation();}
+				 	});
 
 				var text = svg.selectAll("text")
 					.data(nodes)
@@ -311,8 +323,12 @@ sentiaApp.directive("networkVisual", function(){
 					.style("fill-opacity", function(d) { return d.parent === root ? 1 : 0; })
 					.style("display", function(d) { return d.parent === root ? null : "none"; })
 					.text(function(d) {
-					if( typeof d.key === "undefined"){
+					if( !angular.isDefined(d.key) ){
+						// If a key is not defined, then it's an instance, return IP
 						return d.privateIpAddress;
+					} else if ( angular.isDefined(friendlyNames[d.key]) ){
+						// If friendly name, then a VPC, return friendly Name
+						return friendlyNames[d.key];
 					} else {
 						return d.key;
 					}
@@ -339,7 +355,12 @@ sentiaApp.directive("networkVisual", function(){
   					.on("mouseout", tip.hide);
 
 				var nodeLeaf = svg.selectAll(".node--leaf")
-					.on("click", function(d){ return drawInstanceDetails(d, scope.fields, scope); });
+					.on("click", function(d){ 						
+					// Find previously selected, unselect
+		            d3.select(".selected").classed("selected", false);
+		            d3.select(this).classed("selected", true);
+		            return drawInstanceDetails(d, scope.fields, scope); 
+		        });
 
 				function zoomTo(v) {
 					var k = diameter / v[2]; scope.view = v;
@@ -380,4 +401,10 @@ sentiaApp.directive("networkVisual", function(){
 });
 
 // OTHER UTILITY FUNCTIONS
+function highlightClass(className){
+	var full = "." + className;
+	angular.element(".selectedGroup").removeClass("selectedGroup");
+	angular.element(full).addClass(".selectedGroup");
+	
+}
 
