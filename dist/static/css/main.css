@@ -9270,7 +9270,7 @@ figure img {
 .label {
   font: 12px "Helvetica Neue", Helvetica, Arial, sans-serif;
   text-anchor: middle;
-  text-shadow: 0 1px 0 #ffffff, 1px 0 0 #ffffff, -1px 0 0 #ffffff, 0 -1px 0 #ffffff;
+  font-weight: bold;
 }
 .d3-tip {
   line-height: 1;

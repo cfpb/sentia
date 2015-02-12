@@ -176,7 +176,7 @@ sentiaApp.directive("networkVisual", function(){
 
 	var color = d3.scale.linear()
 		.domain([-1, 5])
-		.range(["#E3E4E5","#75787B"])
+		.range(["#FFFFFF","#7FAEAE"])
 		.interpolate(d3.interpolateHcl);
 	
 	var svg = d3.select("network-visual").append("svg")
@@ -262,9 +262,9 @@ sentiaApp.directive("networkVisual", function(){
 	function getInstanceColor( d ){
 	    switch(d.state){
 	        case "running":
-	            return "#ADDC91";
+	            return "#2cb34a";
 	        case "stopped":
-	            return "#E8A091";
+	            return "#8B330A";
 	        default:
 	            return null;
 	    }
@@ -315,6 +315,8 @@ sentiaApp.directive("networkVisual", function(){
 					.enter().append("circle")
 					.attr("class", function(d) { return getNodeClass(d); })
 					.attr("data-identifier", function(d) { return d.key ? d.privateIpAddress : "NO INFO"; })
+					.attr("stroke", function(d){ return "#7FAEAE";})
+					.attr("stroke-width", function(d){ return "1px";})
 					.style("fill", function(d) { return d.children ? color(d.depth) : getInstanceColor(d); })
 					.on("click", function(d) { 
 						if (focus !== d){ scope.$apply(function(){zoom(d);}); } else { d3.event.stopPropagation();}
