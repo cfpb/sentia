@@ -343,7 +343,7 @@ module.exports = function (grunt) {
     grunt.registerTask('css', ['less', 'autoprefixer', 'legacssy', 'cssmin', 'usebanner:css']);
     grunt.registerTask('js', ['concat:js', 'uglify', 'usebanner:js']);
     grunt.registerTask('test', ['jshint']);
-    grunt.registerTask('build', ['test', 'ngAnnotate', 'css', 'js', 'copy']);
+    grunt.registerTask('build', ['test', 'karma', 'ngAnnotate', 'css', 'js', 'copy']);
     grunt.registerTask('default', ['build']);
 
 
