@@ -6,7 +6,7 @@ from fabric.operations import put
 from fabric.context_managers import settings
 
 
-
+#get all ipaddresses stored in edda and process them
 def process_all(argv):
 
     elasticsearch_url = argv[1]
@@ -19,17 +19,18 @@ def process_all(argv):
     else:
       filename = None
 
+    req = urllib2.urlopen(edda_url+'/edda/api/v2/view/instances/;_expand=1;~:(privateIpAddress)')
 
-    req = urllib2.urlopen(edda_url+'/edda/api/v2/aws/addresses')
     ipaddresses = json.load(req)
 
     print "Found " + str(len(ipaddresses)) + " ipaddresses"
+
     count =0
     for machine_ip in ipaddresses:
         count += 1
-        print str(count)+". SSH into machine_ip: " + machine_ip
+        print str(count)+". SSH into machine_ip: " + machine_ip["privateIpAddress"]
         try:
-            with settings(host_string=machine_ip, user=machine_user, key_filename=filename):
+            with settings(host_string=machine_ip["privateIpAddress"], user=machine_user, key_filename=filename):
                 task(elasticurl=elasticsearch_url)
         except:
             print "Issue connecting"
