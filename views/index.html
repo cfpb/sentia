@@ -1,0 +1,123 @@
+{{#extend "stylesheets"}}
+<!--[if lt IE 9]>      <link rel="stylesheet" href="/public/static/css/main.ie.min.css"> <![endif]-->
+<!--[if gt IE 8]><!--> <link rel="stylesheet" href="/public//static/css/main.min.css"> <!--<![endif]-->
+{{/extend}}
+{{#extend "scripts"}}
+<!--[if lt IE 9]>
+<script src="/public/static/vendor/html5shiv/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+<script>
+    // Confirm availability of JS and remove no-js class from html
+    var docElement = document.documentElement;
+    docElement.className = docElement.className.replace(/(^|\s)no-js(\s|$)/, '$1$2');
+</script>
+<script src="/local/localVars.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.11/angular.min.js"></script>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="/public/apps/ng/main.min.js"></script>
+<script src="/public/apps/ng/app.js"></script>
+{{/extend}}
+
+
+<header class="wrapper wrapper__match-content" role="banner">
+    <div class="block block__sub">
+        <h1 id="pageHeader" class="superheader">Sentia</h1>
+        <h6 id="pageSubHeader">Enlightenment for your Environment</h6>
+    </div>
+</header>
+
+<main class="content" id="main" role="main" >
+    <div class="content_bar"></div>
+    <div class="content_wrapper">
+        <div class="content_main" ng-controller="sentiaAppCtrl">
+            <!--             <div class="expandable expandable__padded">
+                            <a class="expandable_target expandable_header"
+                               href="#expandable-padded-content">
+                                <span class="expandable_label expandable_header-left">
+                                    Filter
+                                </span>
+                                <span class="expandable_link expandable_header-right">
+                                    <span class="expandable_cue-open" ng-show="!filter.expanded" ng-click="filter.expanded = true">
+                                        Show
+                                        <span class="cf-icon cf-icon-plus-round"></span>
+                                    </span>
+                                    <span class="expandable_cue-close" ng-show="filter.expanded" ng-click="filter.expanded = false">
+                                        Hide
+                                        <span class="cf-icon cf-icon-minus-round"></span>
+                                    </span>
+                                </span>
+                            </a>
+                            <div class="expandable_content" id="expandable-padded-content" ng-show="filter.expanded">
+
+                            </div>
+                        </div>  -->
+            <div class="">
+                <network-visual val="eddaData" fields="fields" dataFilter=""></network-visual>
+                <div id="instanceDetails" >
+                    <h4>Instance Details:</h4>
+                    <div class='detail-row' ng-repeat="field in fields">
+                        <div class='detail-name'><h6>{{field.label}}</h6></div>
+                        <div class='detail-value' data-fieldkey="{{field.key}}" ng-bind-html="renderHtml(field.value)"></div>
+                    </div>
+                    <div class="discovery-data">
+                        <div class="discovery-header">
+                            <server-details></server-details>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="tabular-view">
+                <!--  BEGIN TABLE CONTENT -->
+                <h2>Tabular View COUNT: {{eddaVals.length}}</h2>
+                <h4>COUNT: {{eddaVals.length}}</h4>
+                State: <input type="text" ng-model="search.state"/>
+                IP: <input type="text" ng-model="search.privateIpAddress"/>
+                Tags: <input type="text" ng-model="search.tags"/>
+                <table class="compact-table">
+                    <thead>
+                    <tr>
+                        <th>IP</th>
+                        <th>State</th>
+                        <th>Instance Type</th>
+                        <th>Subnet</th>
+                        <th>Tags</th>
+                        <th>Security Group</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="inst in eddaVals = (eddaData.values | filter:{ state: search.state, privateIpAddress: search.privateIpAddress })">
+                        <td >
+                            {{ inst.privateIpAddress }}
+                        </td>
+                        <td >
+                            {{ inst.state }}
+                        </td>
+                        <td >
+                            {{ inst.instanceType }}
+                        </td>
+                        <td >
+                            {{ inst.subnetId }}
+                        </td>
+                        <td>
+                            <p ng-repeat="(key, val) in tags = (inst.tags)">{{ val.key }}: {{ val.value }}</p>
+                        </td>
+                        <td>
+                            <p ng-repeat="group in inst.securityGroups">{{ group.groupName }}</p>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
+    </div><!-- END .content_main -->
+    </div>
+
+</main>
+
+<footer role="contentinfo" class="content_main">
+
+</footer>

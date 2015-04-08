@@ -42,5 +42,6 @@ src/vendor/
 # Local Settings #
 ##################
 local/
-dist/local/
+dist/
 sentia-legacy/
+.idea/
