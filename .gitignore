@@ -38,6 +38,9 @@ node_modules/
 bower_components/
 .grunt/
 src/vendor/
+dist/public/
+dist/static/
+dist/*.html
 
 # Local Settings #
 ##################
@@ -45,3 +48,4 @@ local/
 dist/
 sentia-legacy/
 .idea/
+
