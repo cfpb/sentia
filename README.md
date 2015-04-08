@@ -14,6 +14,8 @@ Sentia provides a simple way for stakeholders across your teams to see instructu
 * ElasticSearch
 #### Front-end (Current Contents of Repo)
 * CFPB Capital Framework
+* Angular.js
+* Backbone.js
 * D3.js
 * Node / Bower / Grunt Build Stack
 * LESS
