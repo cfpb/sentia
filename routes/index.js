@@ -7,7 +7,7 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/networkchart', function(req, res, next) {
-    res.render('networkchartindex', { title: 'entia - Enlightenment for your Environment' });
+    res.render('networkchartindex', { title: 'Sentia - Enlightenment for your Environment' });
 });
 
 module.exports = router;

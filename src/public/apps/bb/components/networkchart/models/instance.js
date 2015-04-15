@@ -8,7 +8,12 @@ define(['jquery','underscore','backbone'], function($, _, Backbone) {
                             response.data.name = item.get("value");
                         }
                         else{
-                            response.data.name = "Unknown (tag Name not set)";
+                            if(response.data.instanceId !== undefined){
+                                response.data.name = response.data.instanceId;
+                            }
+                            else {
+                                response.data.name = "Unknown (tag Name not set)";
+                            }
                         }
                     }
                 );

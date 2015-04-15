@@ -17,9 +17,6 @@
                 deps: ['underscore', 'jquery'],
                 exports: 'Backbone'
             },
-            d3: {
-                exports: 'd3'
-            },
             handlebars: {
                 exports: 'Handlebars'
             },

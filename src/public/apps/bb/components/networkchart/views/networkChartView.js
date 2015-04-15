@@ -1,6 +1,7 @@
-define(['jquery','underscore','app','d3','components/networkchart/charts/cloudChart','components/networkchart/charts/networkChartRegions','components/networkchart/charts/networkChartInstances', 'components/networkchart/models/vpc',
+define(['jquery','underscore','app','d3','components/networkchart/charts/cloudChart','components/networkchart/charts/networkChartRegions','components/networkchart/charts/networkChartInstances',
+     'components/networkchart/charts/networkChartSecurityGroup',   'components/networkchart/models/vpc',
     'components/networkchart/models/subnet','components/networkchart/models/instance', 'components/networkchart/collections/vpcList', 'components/networkchart/collections/instanceList','backbone','layoutmanager'],
-    function ($, _, app, d3, cloudChart, networkChartRegions, networkChartInstances, Vpc, Subnet, Instance, VpcList, InstanceList, Backbone) {
+    function ($, _, app, d3, cloudChart, networkChartRegions, NetworkChartInstances, NetworkChartSecurityGroup, Vpc, Subnet, Instance, VpcList, InstanceList, Backbone) {
     "use strict";
 
     var networkChartView = Backbone.Layout.extend({
@@ -409,7 +410,7 @@ define(['jquery','underscore','app','d3','components/networkchart/charts/cloudCh
                     instanceStartYPosition = subnet.get("y") + rectTopPadding;
                     instanceStartXPosition = subnet.get("x") + rectLeftPadding;
 
-                    var awsInstancesChart =  networkChartInstances
+                    var awsInstancesChart =  new NetworkChartInstances()
                         .startXPosition(instanceStartXPosition)
                         .startYPosition(instanceStartYPosition)
                         .regionRectHeight(awsInstanceRectHeight)
@@ -418,7 +419,22 @@ define(['jquery','underscore','app','d3','components/networkchart/charts/cloudCh
                         .groupClassName("instancesRelatedToVpcs" + subnetCounter)
                         .rowPosition(0)
                         .itemsInRow(0)
-                        .rectStyle({'opacity':0.90946499999999997,'fill':'#f68d00','fill-opacity':1 });
+                        .rectStyle({'opacity':0.90946499999999997,'fill':'#f68d00','fill-opacity':1 })
+                        .on("securityGroupHover", function(d,i) {
+
+                            var awsSecurityGroupChart = new NetworkChartSecurityGroup()
+                                .startXPosition(instanceStartXPosition)
+                                .startYPosition(instanceStartYPosition)
+                                .regionRectHeight(awsInstanceRectHeight)
+                                .regionRectWidth(awsInstanceRectWidth)
+                                .groupClassName("securityGroup_" + d.name);
+                            d3.select("body")
+                                .datum(d.securityGroups)
+                                .call(awsSecurityGroupChart);
+                        })
+                        .on("securityGroupHoverOut", function(d,i){
+                            d3.select("g." + "securityGroup_" + d.name).remove();
+                        });
 
                     d3.select("body")
                         .datum(instanceArrayJson)
@@ -458,7 +474,7 @@ define(['jquery','underscore','app','d3','components/networkchart/charts/cloudCh
                      var startYPosition = availZone.get("y") + rectTopPadding;
                      var parentRectWidth =  availZone.get("width");
 
-                     var nonVpcAwsInstancesChart = networkChartInstances
+                     var nonVpcAwsInstancesChart = new NetworkChartInstances()
                             .startXPosition(startXPosition)
                             .startYPosition(startYPosition)
                             .regionRectHeight(awsInstanceRectHeight)
@@ -467,7 +483,24 @@ define(['jquery','underscore','app','d3','components/networkchart/charts/cloudCh
                             .rowPosition(0)
                             .itemsInRow(0)
                             .groupClassName("instancesNotRelatedToVpcs" + counterAvailZoneIndex)
-                            .rectStyle({'opacity':0.90946499999999997,'fill':'#f68d00','fill-opacity':1 });
+                            .rectStyle({'opacity':0.90946499999999997,'fill':'#f68d00','fill-opacity':1 })
+                            .on("securityGroupHover", function(d,i) {
+                                 var xPosition = parseFloat(d3.select("#" + d.name).attr("x")) + 15;
+                                 var yPosition = parseFloat(d3.select("#" + d.name).attr("y")) + 15;
+
+                                 var awsSecurityGroupChart = new NetworkChartSecurityGroup()
+                                     .startXPosition(xPosition)
+                                     .startYPosition(yPosition)
+                                     .regionRectHeight(awsInstanceRectHeight)
+                                     .regionRectWidth(awsInstanceRectWidth)
+                                     .groupClassName("securityGroup_" + d.name);
+                                 d3.select("body")
+                                     .datum(d.securityGroups)
+                                     .call(awsSecurityGroupChart);
+                             })
+                         .on("securityGroupHoverOut", function(d,i){
+                             d3.select("g." + "securityGroup_" + d.name).remove();
+                         });
 
                      d3.select("body")
                             .datum(instanceArrayJson)

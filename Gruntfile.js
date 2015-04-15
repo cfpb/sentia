@@ -329,7 +329,8 @@ module.exports = function (grunt) {
          */
         watch: {
             default: {
-                files: ['Gruntfile.js', '<%= loc.src %>/public/static/css/**/*.less', '<%= loc.src %>/public/apps/**/*.js', '<%= loc.src %>/*.html'],
+                files: ['Gruntfile.js', '<%= loc.src %>/public/static/css/**/*.less', '<%= loc.src %>/public/apps/**/*.js',
+                    '<%= loc.src %>/*.html'],
                 tasks: ['default']
             }
         }
