@@ -1,7 +1,7 @@
 define(["app", "backbone", "d3", "components/networkchart/views/networkChartView","components/networkchart/models/region",
-    "components/networkchart/collections/regionList", "components/networkchart/collections/availabilityZoneList","components/networkchart/collections/vpcList"
+        "components/networkchart/models/vpc","components/networkchart/collections/regionList", "components/networkchart/collections/availabilityZoneList","components/networkchart/collections/vpcList"
     ,"components/networkchart/collections/subnetList","components/networkchart/collections/instanceList"],
- function(app, Backbone, d3, NetworkChartView, Region, RegionList, AvailabilityZoneList, VpcList, SubnetList, InstanceList) {
+ function(app, Backbone, d3, NetworkChartView, Region, Vpc, RegionList, AvailabilityZoneList, VpcList, SubnetList, InstanceList) {
      "use strict";
 
      var networkChartApp = function() {
@@ -12,7 +12,7 @@ define(["app", "backbone", "d3", "components/networkchart/views/networkChartView
          var instanceList = new InstanceList();
 
          window.json_Callback= function(data){
-             console.log("json_Callback called");
+             //console.log("json_Callback called");
          };
 
          //Edda looks for specific parameter of in url to _callback signify CORS request
@@ -56,15 +56,14 @@ define(["app", "backbone", "d3", "components/networkchart/views/networkChartView
                              //console.log("instances fetch successful: " + JSON.stringify(rtnData))
                          }
                      })).done(function(){
-                         console.log("running determineNumberOfInstancePerArea");
-                         console.log("instanceCount: " + instanceList.length);
-
 
                          availabilityZoneList.forEach(function(availZone,index, array){
                              var numberOfInstances = 0;
                              instanceList.forEach(function(instance, instanceIndex, instances){
                                  var placement = instance.get("placement");
                                  if(placement.availabilityZone ===availZone.get("zoneName")){
+                                     //set VpcId in which availZone is within
+                                     availZone.set("vpcId",instance.get("vpcId"));
                                      numberOfInstances++;
                                  }
                              });
@@ -72,13 +71,22 @@ define(["app", "backbone", "d3", "components/networkchart/views/networkChartView
                          });
 
                          //calculate number of instances per Region
+                         var vpcsInRegion = new VpcList();
                          regionList.forEach(function(region){
                              var numberOfInstancesInRegion = 0;
                              availabilityZoneList.forEach(function(availZone){
                                  if(availZone.get("regionName") === region.get("name")){
-                                     numberOfInstancesInRegion++;
+                                     numberOfInstancesInRegion = numberOfInstancesInRegion + availZone.get("numberOfInstances");
+
+                                     var vpcExists = vpcsInRegion.findWhere({vpcId: availZone.get("vpcId")})
+                                     if(vpcExists === undefined){
+                                         var vpc = new Vpc({ vpcId: availZone.get("vpcId")});
+                                         //set vpc name and #instances as well
+                                         vpcsInRegion.add(vpc);
+                                     }
                                  }
                              });
+                             region.set("vpcCollection",vpcsInRegion);
                              region.set("numberOfInstances",numberOfInstancesInRegion);
                          });
 
@@ -90,8 +98,8 @@ define(["app", "backbone", "d3", "components/networkchart/views/networkChartView
                                  remove: false,
                                  silent: false,
                                  success: function (data, rtnData){
-                                     console.log("vpc fetch successful, rtnData: " + JSON.stringify(rtnData));
-                                     console.log("vpc fetch successful");
+                                     //console.log("vpc fetch successful, rtnData: " + JSON.stringify(rtnData));
+                                     //console.log("vpc fetch successful");
                                  }
                              })).done(function(){
                                  //calculate # of instances per vpc
@@ -105,6 +113,20 @@ define(["app", "backbone", "d3", "components/networkchart/views/networkChartView
                                      vpc.set("numberOfInstances",numberOfInstancesInVpc);
                                  });
 
+                                //update regionList with vpc Info
+                               regionList.forEach(function(region){
+                                   var vpcsAssociated = region.get("vpcCollection");
+                                   vpcsAssociated.forEach(function(assocVpc){
+                                       var vpcData = vpcList.findWhere({vpcId: assocVpc.get("vpcId")})
+                                       if(vpcData!==undefined){
+                                           //update region's Vpc Collection
+                                           assocVpc.set("name",vpcData.get("name"));
+                                           assocVpc.set("numberOfInstances",vpcData.get("numberOfInstances"))
+                                       }
+                                   });
+                                  //var vpcData = vpcList.findWhere({vpcId: region.get})
+                               });
+
                              });
 
                          subnetList.url = "http://localhost:8080/edda/api/v2/aws/subnets;_pp;_meta;";
@@ -115,10 +137,10 @@ define(["app", "backbone", "d3", "components/networkchart/views/networkChartView
                                  remove: false,
                                  silent: false,
                                  success: function (data, rtnData){
-                                     console.log("subnetList fetch successful, rtnData: " + JSON.stringify(rtnData))
+                                     //console.log("subnetList fetch successful, rtnData: " + JSON.stringify(rtnData))
                                  }
                              })).done(function(){
-                                 console.log("subnets fetch complete");
+                                 //console.log("subnets fetch complete");
                                  subnetList.forEach(function(subnet){
                                      var numberOfInstancesInSubnet = 0;
                                      instanceList.forEach(function(instance){

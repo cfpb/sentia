@@ -240,11 +240,44 @@ module.exports = function (grunt) {
                     },
                     {
                         expand: true,
+                        src: [
+                            // node file
+                            'server.js'
+                        ],
+                        dest: '<%= loc.dist %>'
+                    },
+                    {
+                        expand: true,
+                        src: [
+                            // node route files
+                            'routes/*.js'
+                        ],
+                        dest: '<%= loc.dist %>'
+                    },
+                    {
+                        expand: true,
+                        src: [
+                            // node view files
+                            'views/*.html'
+                        ],
+                        dest: '<%= loc.dist %>'
+                    },
+                    {
+                        expand: true,
+                        cwd: 'node_modules',
+                        src: [
+                            // node modules
+                            '**/*'
+                        ],
+                        dest: '<%= loc.dist %>/node_modules'
+                    },
+                    {
+                        expand: true,
                         cwd: 'src/public/apps',
                         src: [
                             '**/*'
                         ],
-                        dest: 'dist/public/apps'
+                        dest: '<%= loc.dist %>/public/apps'
                     },
                     {
                         expand: true,
@@ -252,7 +285,7 @@ module.exports = function (grunt) {
                         src: [
                             '**/*'
                         ],
-                        dest: 'dist/public/vendor'
+                        dest: '<%= loc.dist %>/public/vendor'
                     },
                     {
                         expand: true,

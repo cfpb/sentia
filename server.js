@@ -13,6 +13,8 @@ var app = express();
 
 var port = process.env.PORT || '3000';
 
+//trust reverse proxy nginx
+app.set("trust proxy", true);
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'html');
@@ -22,7 +24,7 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'dist')));   //change to 'dist' when all grunt task configured
+app.use(express.static(path.join(__dirname, 'dist')));   //change from 'src' to 'dist' when all grunt task configured
 
 var blocks = {};
 

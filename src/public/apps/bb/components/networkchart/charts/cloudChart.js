@@ -21,7 +21,7 @@ define(["jquery", "d3"], function ($, d3) {
                 startEnter = d3.select(this)
                     .append("svg")
                     .attr("xmlns","http://www.w3.org/2000/svg")
-                    .attr("height", "4500px")
+                    //.attr("height", "4500px")
                     .attr("width", "100%") ;
             }
             else{

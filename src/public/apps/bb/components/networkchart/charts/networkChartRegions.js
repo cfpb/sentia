@@ -29,7 +29,7 @@ define(["jquery", "d3"], function ($, d3) {
                 startEnter = d3.select(this)
                     .append("svg")
                     .attr("xmlns","http://www.w3.org/2000/svg")
-                    .attr("height", "4500px")
+                    //.attr("height", "4500px")
                     .attr("width", "100%") ;
             }
             else{
@@ -68,10 +68,10 @@ define(["jquery", "d3"], function ($, d3) {
                 .attr("font-family","Verdana")
                 .attr("font-weight","bold")
                 .attr("x", function(d,i){
-                    return startXPosition;
+                    return startXPosition + titleLabelLeftPadding;
                 })
                 .attr("y", function(d,i){
-                    var posTextY = startYPosition;
+                    var posTextY = startYPosition - 10;
                     return posTextY;
 
                 })

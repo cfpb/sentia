@@ -8,6 +8,7 @@ define(["jquery", "d3"], function ($, d3) {
       var regionRectHeight = 200;
       var regionRectWidth = 250;
       var parentRectWidth = 570;
+      var regionRectTopPadding = 15;
       var rectStyle = {'opacity': 0.90946499999999997, 'fill': '#f68d00', 'fill-opacity': 1};  //default style
       var groupClassName = "instanceGroup";
       var rowPosition = 0;
@@ -29,7 +30,6 @@ define(["jquery", "d3"], function ($, d3) {
                       startEnter = d3.select(this)
                           .append("svg")
                           .attr("xmlns", "http://www.w3.org/2000/svg")
-                          .attr("height", "4500px")
                           .attr("width", "100%");
                   }
                   else {
@@ -94,7 +94,7 @@ define(["jquery", "d3"], function ($, d3) {
                           //if adding the instance rect in this spot, causes it to be outside of parent rect
                           //then move down to next row
                           if (newRow) {
-                              rowPosition = rowPosition + instanceRectHeight + 20;
+                              rowPosition = rowPosition + instanceRectHeight + regionRectTopPadding;
                               finalYPosition = rowPosition;
                           }
                           else {
@@ -158,13 +158,13 @@ define(["jquery", "d3"], function ($, d3) {
                           //calculate y
                           var finalYPosition = 0;
                           if (rowPosition === 0) {             //initial to rowPosition to startYPosition
-                              rowPosition = startYPosition + 25;
+                              rowPosition = startYPosition + regionRectTopPadding;
                           }
 
                           //if adding the instance rect in this spot, causes it to be outside of parent rect
                           //then move down to next row
                           if (newRow) {
-                              rowPosition = rowPosition + instanceRectHeight + 15;
+                              rowPosition = rowPosition + instanceRectHeight + regionRectTopPadding;
                               finalYPosition = rowPosition;
                           }
                           else {
@@ -220,6 +220,27 @@ define(["jquery", "d3"], function ($, d3) {
                               return "Private Ip: ";
                           }
                       });
+                  //availZone
+                  //var placement = instance.get("placement");
+                  labelSection.append("tspan")
+                      .attr("x", function (d) {
+                          return this.parentElement.attributes.x.value;
+                      })
+                      .attr("dy", "10")
+                      .text(function (d) {
+                          if (d.placement) {
+                              if(d.placement.availabilityZone){
+                                  return "Avail. Zone: " + d.placement.availabilityZone;
+                              }
+                              else{
+                                  return "Avail. Zone: ";
+                              }
+
+                          }
+                          else {
+                              return "Avail. Zone: ";
+                          }
+                      });
 
                   //security group clickable item
                   labelSection.append("tspan")
@@ -273,6 +294,12 @@ define(["jquery", "d3"], function ($, d3) {
           parentRectWidth = value;
           return my;
       }
+
+      my.regionRectTopPadding = function (value){
+          if(!arguments.length) return regionRectTopPadding;
+          regionRectTopPadding = value;
+          return my;
+      };
 
       my.rectStyle = function (value) {
           if (!arguments.length) return rectStyle;

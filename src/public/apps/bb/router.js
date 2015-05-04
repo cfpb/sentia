@@ -1,5 +1,5 @@
-﻿define(["app", "backbone", "components/home/homeApp", "components/networkchart/networkChartApp"],
-    function (app, Backbone, homeApp, networkChartApp) {
+﻿define(["app", "backbone", "components/home/homeApp", "components/networkchart/networkChartApp","components/networkchart/networkChartNonVpcsApp"],
+    function (app, Backbone, homeApp, networkChartApp, networkChartNonVpcsApp) {
         var router = Backbone.Router.extend({
             routes:
             {
@@ -7,13 +7,18 @@
                 "/": "home",
                 "home": "home",
                 "networkChart": "networkChart",
-                "/networkChart": "networkChart"
+                "/networkChart": "networkChart",
+                "networkChartNonVpcs" :"networkChartNonVpcs",
+                "/networkChartNonVpcs" :"networkChartNonVpcs"
             },
             home: function() {
                homeApp();
             },
             networkChart: function() {
                 networkChartApp();
+            },
+            networkChartNonVpcs: function() {
+                networkChartNonVpcsApp();
             },
             initialize: function() {
             },
