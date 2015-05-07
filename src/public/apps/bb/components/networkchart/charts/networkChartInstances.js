@@ -1,4 +1,4 @@
-define(["jquery", "d3"], function ($, d3) {
+define(["jquery", "d3","moment"], function ($, d3, moment) {
     "use strict";
   var NetworkChartInstances = function() {
       //variables declared and defaults set , each of this can be overridden (typically are) via a method
@@ -14,7 +14,8 @@ define(["jquery", "d3"], function ($, d3) {
       var rowPosition = 0;
       var itemsInRow = 0;
       var newRow = false;
-      var dispatch = d3.dispatch("securityGroupHover","securityGroupHoverOut");
+      var dispatch = d3.dispatch("securityGroupHover","securityGroupHoverOut","privateIpsGroupHover","privateIpsGroupHoverOut",
+      "ebsHover","ebsHoverOut","tagsHover","tagsHoverOut");
 
       function my(selection) {
           //generate chart
@@ -110,7 +111,9 @@ define(["jquery", "d3"], function ($, d3) {
                       })
                       .attr("id", function (d) {
                           if (d.name) {
-                              return d.name;
+                              //remove special characters
+                              var rectId = d.name.replace(/(:|\.|\[|\]|,)/g,"");
+                              return rectId;
                           }
                       });
 
@@ -199,11 +202,11 @@ define(["jquery", "d3"], function ($, d3) {
                       })
                       .attr("dy", "10")
                       .text(function (d) {
-                          if (d.description) {
-                              return "Description: " + d.description;
+                          if (d.imageId) {
+                                  return "Image id: " + d.imageId;
                           }
                           else {
-                              return "Description: ";
+                              return "Image id: ";
                           }
                       });
 
@@ -213,15 +216,94 @@ define(["jquery", "d3"], function ($, d3) {
                       })
                       .attr("dy", "10")
                       .text(function (d) {
-                          if (d.privateIp) {
-                              return "Private Ip: " + d.privateIp;
+                          if (d.state) {
+                              return "State: " + d.state.name;
                           }
                           else {
-                              return "Private Ip: ";
+                              return "State: ";
                           }
                       });
-                  //availZone
-                  //var placement = instance.get("placement");
+
+
+                  labelSection.append("tspan")
+                      .attr("x", function (d) {
+                          return this.parentElement.attributes.x.value;
+                      })
+                      .attr("dy", "10")
+                      .text(function (d) {
+                          if (d.launchTime) {
+                              var formattedLaunchDate = moment(d.launchTime).format("LLL");
+                              return "Launched: " + formattedLaunchDate;
+                          }
+                          else {
+                              return "Launched: ";
+                          }
+                      });
+
+
+                  labelSection.append("tspan")
+                      .attr("x", function (d) {
+                          return this.parentElement.attributes.x.value;
+                      })
+                      .attr("dy", "10")
+                      .text(function (d) {
+                          if (d.instanceType) {
+                              return "Type: " + d.instanceType;
+                          }
+                          else {
+                              return "Type: ";
+                          }
+                      });
+
+
+                  labelSection.append("tspan")
+                      .attr("x", function (d) {
+                          return this.parentElement.attributes.x.value;
+                      })
+                      .attr("dy", "10")
+                      .text(function (d) {
+                          if (d.kernelId) {
+                              return "Kernel: " + d.kernelId;
+                          }
+                          else {
+                              return "Kernel: ";
+                          }
+                      });
+
+                  labelSection.append("tspan")
+                      .attr("x", function (d) {
+                          return this.parentElement.attributes.x.value;
+                      })
+                      .attr("dy", "10")
+                      .text(function (d) {
+                          if (d.monitoring) {
+                              if(d.monitoring.state){
+                               return "Monitoring: " + d.monitoring.state;
+                              }
+                              else{
+                                  return "Monitoring: ";
+                              }
+                          }
+                          else {
+                              return "Monitoring: ";
+                          }
+                      });
+
+                  labelSection.append("tspan")
+                      .attr("x", function (d) {
+                          return this.parentElement.attributes.x.value;
+                      })
+                      .attr("dy", "10")
+                      .text(function (d) {
+                          if (d.description) {
+                              return "Description: " + d.description;
+                          }
+                          else {
+                              return "Description: ";
+                          }
+                      });
+
+
                   labelSection.append("tspan")
                       .attr("x", function (d) {
                           return this.parentElement.attributes.x.value;
@@ -242,7 +324,7 @@ define(["jquery", "d3"], function ($, d3) {
                           }
                       });
 
-                  //security group clickable item
+                  //security group on hover item
                   labelSection.append("tspan")
                       .attr("x", function (d) {
                           return this.parentElement.attributes.x.value;
@@ -254,6 +336,41 @@ define(["jquery", "d3"], function ($, d3) {
                       .on("mouseover", dispatch.securityGroupHover)
                       .on("mouseout", dispatch.securityGroupHoverOut);
 
+                  //Private Ips group on hover item
+                  labelSection.append("tspan")
+                      .attr("x", function (d) {
+                          return this.parentElement.attributes.x.value;
+                      })
+                      .attr("dy", "10")
+                      .text("Ip Info.")
+                      .attr("text-decoration", "underline")
+                      .style("cursor", "pointer")
+                      .on("mouseover", dispatch.privateIpsGroupHover)
+                      .on("mouseout", dispatch.privateIpsGroupHoverOut);
+
+                  //Ebs on hover item
+                  labelSection.append("tspan")
+                      .attr("x", function (d) {
+                          return this.parentElement.attributes.x.value;
+                      })
+                      .attr("dy", "10")
+                      .text("Ebs")
+                      .attr("text-decoration", "underline")
+                      .style("cursor", "pointer")
+                      .on("mouseover", dispatch.ebsHover)
+                      .on("mouseout", dispatch.ebsHoverOut);
+
+                  //tags on hover item
+                  labelSection.append("tspan")
+                      .attr("x", function (d) {
+                          return this.parentElement.attributes.x.value;
+                      })
+                      .attr("dy", "10")
+                      .text("Tags")
+                      .attr("text-decoration", "underline")
+                      .style("cursor", "pointer")
+                      .on("mouseover", dispatch.tagsHover)
+                      .on("mouseout", dispatch.tagsHoverOut);
 
               }
           );

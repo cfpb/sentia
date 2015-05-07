@@ -299,6 +299,14 @@ module.exports = function (grunt) {
                     },
                     {
                         expand: true,
+                        cwd: '<%= loc.src %>/public/local',
+                        src: [
+                            '**/*'
+                        ],
+                        dest: '<%= loc.dist %>/public/local'
+                    },
+                    {
+                        expand: true,
                         cwd: '<%= loc.src %>',
                         src: [
                             // Vendor files

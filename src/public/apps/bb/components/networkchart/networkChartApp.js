@@ -151,12 +151,10 @@ define(["app", "backbone", "d3", "components/networkchart/views/networkChartView
                                      subnet.set("numberOfInstances",numberOfInstancesInSubnet);
                                  });
 
-                                 _.extend(vpcList, Backbone.Events);
-
                                  var networkChartView = new NetworkChartView({ manage: true, regionList: regionList, availabilityZoneList: availabilityZoneList,
                                      vpcList: vpcList, subnetList: subnetList, instanceList: instanceList});
 
-                                 var layoutHome = app.useLayout('networkchart/networkChartLayout', { view:{ "#containerOne" : networkChartView } });
+                                 var layoutHome = app.useLayout('networkchart/networkChartLayout', { view:{ "#networkchart" : networkChartView } });
                                  layoutHome.render();
 
                              });

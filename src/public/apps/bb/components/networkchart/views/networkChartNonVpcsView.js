@@ -1,8 +1,8 @@
 define(['jquery','underscore','app','d3','components/networkchart/charts/cloudChart','components/networkchart/charts/networkChartRegions','components/networkchart/charts/networkChartInstances',
-        'components/networkchart/charts/networkChartSecurityGroup',   'components/networkchart/models/vpc',
+        'components/networkchart/charts/networkChartPopover',  'components/networkchart/charts/networkChartIps', 'components/networkchart/models/vpc',
         'components/networkchart/models/subnet','components/networkchart/models/instance', 'components/networkchart/collections/vpcList', 'components/networkchart/collections/instanceList','backbone','layoutmanager'],
-    function ($, _, app, d3, cloudChart, networkChartRegions, NetworkChartInstances, NetworkChartSecurityGroup,
-                 Vpc, Subnet, Instance, VpcList, InstanceList, Backbone) {
+    function ($, _, app, d3, cloudChart, networkChartRegions, NetworkChartInstances, NetworkChartPopover,
+              NetworkChartIps, Vpc, Subnet, Instance, VpcList, InstanceList, Backbone) {
         "use strict";
 
         var networkChartForNonVpcsView = Backbone.Layout.extend({
@@ -12,14 +12,37 @@ define(['jquery','underscore','app','d3','components/networkchart/charts/cloudCh
 
                 this.regionList = options.regionList;
                 this.availabilityZoneList = options.availabilityZoneList;
-                this.vpcList = options.vpcList;
                 this.subnetList = options.subnetList;
                 this.instanceList = options.instanceList;
 
             },
+            //backbone layout manager serialize method, serializes data to handlebars
+            serialize: function(){
+              if(this.instancesExist()) {
+                  return { Message: ""}
+              }
+                else{
+                  return { Message: "Currently No Instances for this Chart."}
+              }
+            },
+            instancesExist: function(){
+                var numInstances=0;
+                var that = this;
+
+                that.regionList.forEach(function(regionArea, index, array) {
+                    numInstances += regionArea.get("numberOfInstances");
+                });
+
+                if(numInstances>0){
+                    return true;
+                }
+                else{
+                    return false;
+                }
+
+            },
             regionList: null,
             availabilityZoneList: null,
-            vpcList: null,
             subnetList: null,
             instanceList: null,
             afterRender: function () {
@@ -30,6 +53,9 @@ define(['jquery','underscore','app','d3','components/networkchart/charts/cloudCh
                 var awsInstanceRectHeight = 120;
                 var awsInstanceRectWidth = 200;
                 var awsSecurityGroupRectHeight = 50;
+                var awsIpsRectHeight = 60;
+                var awsEbsRectHeight = 100;
+                var awsTagsRectHeight = 40;
                 var regionParentWidth = 630;
                 var numColumns = 2;
                 var rectTopPadding = 30;
@@ -111,7 +137,13 @@ define(['jquery','underscore','app','d3','components/networkchart/charts/cloudCh
                     }
                 });
                 //Set Svg Height
-                $("svg").height(svgHeight);
+                if(svgHeight!==0) {
+                    $("svg").height(svgHeight);
+                }
+                else{
+                    //no non-VPC instances , set height to display awsCloudChartHeading
+                    $("svg").height(300);
+                }
 
                 //Create Avail. Zones Section Chart (for non-vpc instances)
 
@@ -205,23 +237,129 @@ define(['jquery','underscore','app','d3','components/networkchart/charts/cloudCh
                             .itemsInRow(0)
                             .groupClassName("instancesNotRelatedToVpcs" + counterAvailZoneIndex)
                             .rectStyle({'opacity':0.90946499999999997,'fill':'#f68d00','fill-opacity':1 })
-                            .on("securityGroupHover", function(d,i) {
-                                var xPosition = parseFloat(d3.select("#" + d.name).attr("x")) + 15;
-                                var yPosition = parseFloat(d3.select("#" + d.name).attr("y")) + 15;
+                            .on("securityGroupHover", function (d, i) {
+                                var nameSelector = "#" + d.name.replace(/(:|\.|\[|\]|,)/g,"");
+                                var nameCssClass = d.name.replace(/(:|\.|\[|\]|,)/g,"");
 
-                                var awsSecurityGroupChart = new NetworkChartSecurityGroup()
+                                var xPosition = parseFloat(d3.select(nameSelector).attr("x")) + 15;
+                                var yPosition = parseFloat(d3.select(nameSelector).attr("y")) + 15;
+                                var selectionData = [ {"selectionLabel": "Group id", "selectionSelector": "groupId" } ,
+                                    {"selectionLabel": "Group Name", "selectionSelector": "groupName"} ];
+
+                                var awsSecurityGroupChart = new NetworkChartPopover()
                                     .startXPosition(xPosition)
                                     .startYPosition(yPosition)
-                                    .regionRectHeight(awsInstanceRectHeight)
+                                    .regionRectHeight(awsSecurityGroupRectHeight)
                                     .regionRectWidth(awsInstanceRectWidth)
-                                    .groupClassName("securityGroup_" + d.name);
+                                    .textTopPadding(15)
+                                    .textLeftPadding(92)
+                                    .groupClassName("securityGroup_" + nameCssClass)
+                                    .numberOfGroups(d.securityGroups.length)
+                                    .popoverLabel("Security Group(s)")
+                                    .selectionData(selectionData);
+
                                 d3.select("body")
                                     .datum(d.securityGroups)
                                     .call(awsSecurityGroupChart);
                             })
-                            .on("securityGroupHoverOut", function(d,i){
-                                d3.select("g." + "securityGroup_" + d.name).remove();
+                            .on("securityGroupHoverOut", function (d, i) {
+                                var nameCssClass = d.name.replace(/(:|\.|\[|\]|,)/g,"");
+                                d3.select("g." + "securityGroup_" + nameCssClass).remove();
+                            })
+                            .on("privateIpsGroupHover", function (d, i){
+
+                                //need to escape out special characters from d.name
+                                var nameSelector = "#" + d.name.replace(/(:|\.|\[|\]|,)/g,"");
+                                var nameCssClass = d.name.replace(/(:|\.|\[|\]|,)/g,"");
+                                var xPosition = parseFloat(d3.select(nameSelector).attr("x")) + 15;
+                                var yPosition = parseFloat(d3.select(nameSelector).attr("y")) + 15;
+                                var numberOfGroups =0;
+                                //ip information contained within nested array networkInterfaces[].privateIpAddresses[]
+                                //calculate numberOfGroups (number of ip info items)
+                                _.each(d.networkInterfaces,function(element,index,list){
+                                    numberOfGroups += element.privateIpAddresses.length;
+                                });
+
+                                var awsIpsChart = new NetworkChartIps()
+                                    .startXPosition(xPosition)
+                                    .startYPosition(yPosition)
+                                    .regionRectHeight(awsIpsRectHeight)
+                                    .regionRectWidth(awsInstanceRectWidth)
+                                    .groupClassName("privateIps_" + nameCssClass)
+                                    .numberOfGroups(numberOfGroups)
+                                    .popoverLabel("Ip Info.");
+
+
+                                d3.select("body")
+                                    .datum(d.networkInterfaces)
+                                    .call(awsIpsChart);
+                            })
+                            .on("privateIpsGroupHoverOut", function (d, i){
+                                var nameCssClass = d.name.replace(/(:|\.|\[|\]|,)/g,"");
+                                d3.select("g." + "privateIps_" + nameCssClass).remove();
+                            })
+                            .on("ebsHover", function (d, i){
+                                var nameSelector = "#" + d.name.replace(/(:|\.|\[|\]|,)/g,"");
+                                var nameCssClass = d.name.replace(/(:|\.|\[|\]|,)/g,"");
+
+                                var xPosition = parseFloat(d3.select(nameSelector).attr("x")) + 15;
+                                var yPosition = parseFloat(d3.select(nameSelector).attr("y")) + 15;
+                                var selectionData = [ {"selectionLabel": "Device Name ", "selectionSelector": "deviceName" } ,
+                                    {"selectionLabel": "Volume Id", "selectionSelector": "ebs.volumeId"},
+                                    {"selectionLabel": "Status", "selectionSelector": "ebs.status"},
+                                    {"selectionLabel": "Delete on Termination", "selectionSelector": "ebs.deleteOnTermination"},
+                                    {"selectionLabel": "Attach Time", "selectionSelector": "ebs.attachTime"}];
+
+                                var awsEbsChart = new NetworkChartPopover()
+                                    .startXPosition(xPosition)
+                                    .startYPosition(yPosition)
+                                    .regionRectHeight(awsEbsRectHeight)
+                                    .regionRectWidth(awsInstanceRectWidth)
+                                    .textTopPadding(15)
+                                    .textLeftPadding(97)
+                                    .groupClassName("ebs_" + nameCssClass)
+                                    .numberOfGroups(d.blockDeviceMappings.length)
+                                    .popoverLabel("Ebs")
+                                    .selectionData(selectionData);
+
+                                d3.select("body")
+                                    .datum(d.blockDeviceMappings)
+                                    .call(awsEbsChart);
+                            })
+                            .on("ebsHoverOut", function (d, i){
+                                var nameCssClass = d.name.replace(/(:|\.|\[|\]|,)/g,"");
+                                d3.select("g." + "ebs_" + nameCssClass).remove();
+                            })
+                            .on("tagsHover", function (d, i){
+                                var nameSelector = "#" + d.name.replace(/(:|\.|\[|\]|,)/g,"");
+                                var nameCssClass = d.name.replace(/(:|\.|\[|\]|,)/g,"");
+
+                                var xPosition = parseFloat(d3.select(nameSelector).attr("x")) + 15;
+                                var yPosition = parseFloat(d3.select(nameSelector).attr("y")) + 15;
+                                var selectionData = [ {"selectionLabel": "Tag Name ", "selectionSelector": "key" } ,
+                                    {"selectionLabel": "Tag Value", "selectionSelector": "value"}];
+
+                                var awsTagChart = new NetworkChartPopover()
+                                    .startXPosition(xPosition)
+                                    .startYPosition(yPosition)
+                                    .regionRectHeight(awsTagsRectHeight)
+                                    .regionRectWidth(awsInstanceRectWidth)
+                                    .textTopPadding(15)
+                                    .textLeftPadding(97)
+                                    .groupClassName("tags_" + nameCssClass)
+                                    .numberOfGroups(d.tags.length)
+                                    .popoverLabel("Tags")
+                                    .selectionData(selectionData);
+
+                                d3.select("body")
+                                    .datum(d.tags)
+                                    .call(awsTagChart);
+                            })
+                            .on("tagsHoverOut", function (d, i){
+                                var nameCssClass = d.name.replace(/(:|\.|\[|\]|,)/g,"");
+                                d3.select("g." + "tags_" + nameCssClass).remove();
                             });
+
 
                         d3.select("body")
                             .datum(instanceArrayJson)

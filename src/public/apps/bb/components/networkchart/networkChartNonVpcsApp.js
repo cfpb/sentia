@@ -61,9 +61,8 @@ define(["app", "backbone", "d3", "components/networkchart/views/networkChartNonV
                         var numberOfInstances = 0;
                         instanceList.forEach(function(instance, instanceIndex, instances){
                             var placement = instance.get("placement");
-                            if(placement.availabilityZone ===availZone.get("zoneName")){
-                                //set VpcId in which availZone is within
-                                availZone.set("vpcId",instance.get("vpcId"));
+                            //check if in avail. zone and not associated with a Vpc
+                            if(placement.availabilityZone ===availZone.get("zoneName") && instance.get("vpcId")===null){
                                 numberOfInstances++;
                             }
                         });
@@ -71,63 +70,18 @@ define(["app", "backbone", "d3", "components/networkchart/views/networkChartNonV
                     });
 
                     //calculate number of instances per Region
-                    var vpcsInRegion = new VpcList();
+
                     regionList.forEach(function(region){
                         var numberOfInstancesInRegion = 0;
                         availabilityZoneList.forEach(function(availZone){
                             if(availZone.get("regionName") === region.get("name")){
                                 numberOfInstancesInRegion = numberOfInstancesInRegion + availZone.get("numberOfInstances");
-
-                                var vpcExists = vpcsInRegion.findWhere({vpcId: availZone.get("vpcId")})
-                                if(vpcExists === undefined){
-                                    var vpc = new Vpc({ vpcId: availZone.get("vpcId")});
-                                    //set vpc name and #instances as well
-                                    vpcsInRegion.add(vpc);
-                                }
                             }
                         });
-                        region.set("vpcCollection",vpcsInRegion);
                         region.set("numberOfInstances",numberOfInstancesInRegion);
                     });
 
-                    vpcList.url = "http://localhost:8080/edda/api/v2/aws/vpcs;_pp;_meta;";
-                    $.when(vpcList.fetch({
-                        type: "GET",
-                        cache: true,
-                        reset: true,
-                        remove: false,
-                        silent: false,
-                        success: function (data, rtnData){
-                            //console.log("vpc fetch successful, rtnData: " + JSON.stringify(rtnData));
-                            //console.log("vpc fetch successful");
-                        }
-                    })).done(function(){
-                        //calculate # of instances per vpc
-                        vpcList.forEach(function(vpc){
-                            var numberOfInstancesInVpc = 0;
-                            instanceList.forEach(function(instance){
-                                if(instance.get("vpcId") === vpc.get("vpcId")){
-                                    numberOfInstancesInVpc++;
-                                }
-                            });
-                            vpc.set("numberOfInstances",numberOfInstancesInVpc);
-                        });
 
-                        //update regionList with vpc Info
-                        regionList.forEach(function(region){
-                            var vpcsAssociated = region.get("vpcCollection");
-                            vpcsAssociated.forEach(function(assocVpc){
-                                var vpcData = vpcList.findWhere({vpcId: assocVpc.get("vpcId")})
-                                if(vpcData!==undefined){
-                                    //update region's Vpc Collection
-                                    assocVpc.set("name",vpcData.get("name"));
-                                    assocVpc.set("numberOfInstances",vpcData.get("numberOfInstances"))
-                                }
-                            });
-                            //var vpcData = vpcList.findWhere({vpcId: region.get})
-                        });
-
-                    });
 
                     subnetList.url = "http://localhost:8080/edda/api/v2/aws/subnets;_pp;_meta;";
                     $.when(subnetList.fetch({
@@ -144,19 +98,19 @@ define(["app", "backbone", "d3", "components/networkchart/views/networkChartNonV
                         subnetList.forEach(function(subnet){
                             var numberOfInstancesInSubnet = 0;
                             instanceList.forEach(function(instance){
-                                if(instance.get("subnetId") === subnet.get("subnetId")){
+                                //check to see if instance assoc. with subnet and not assoc. to a Vpc
+                                if(instance.get("subnetId") === subnet.get("subnetId") && instance.get("vpcId") === null){
                                     numberOfInstancesInSubnet++;
                                 }
                             });
                             subnet.set("numberOfInstances",numberOfInstancesInSubnet);
                         });
 
-                        _.extend(vpcList, Backbone.Events);
 
                         var networkChartNonVpcsView = new NetworkChartNonVpcsView({ manage: true, regionList: regionList, availabilityZoneList: availabilityZoneList,
-                            vpcList: vpcList, subnetList: subnetList, instanceList: instanceList});
+                             subnetList: subnetList, instanceList: instanceList});
 
-                        var layoutHome = app.useLayout('networkchart/networkChartLayout', { view:{ "#containerOne" : networkChartNonVpcsView } });
+                        var layoutHome = app.useLayout('networkchart/networkChartLayout', { view:{ "#networkchart" : networkChartNonVpcsView } });
                         layoutHome.render();
 
                     });

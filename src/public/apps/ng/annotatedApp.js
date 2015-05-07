@@ -110,7 +110,7 @@ sentiaApp.service("DataService",["$http","$q",function($http, $q){
 sentiaApp.directive("serverDetails", ["DataService", "$http", function(DataService, $http) {
 	return {
 	    restrict: "E",
-	    templateUrl: "serverDetailsTemplate.html", 	
+	    templateUrl: "public/apps/ng/serverDetailsTemplate.html",
 	    link: function(scope, element, attr) {	    	
 	    	scope.$watchCollection("fields.privateIpAddress", function (newVal, oldVal) {
 				// if 'val' is undefined, exit
