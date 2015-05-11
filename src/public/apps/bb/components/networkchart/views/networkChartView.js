@@ -79,6 +79,8 @@ define(['jquery','underscore','app','d3','components/networkchart/charts/cloudCh
                     .datum(heading)
                     .call(awsCloudChartHeading);
 
+                var cloudChartHeight = d3.select("g.cloudAws").node().getBBox().height;
+
                 //underscore.js utilizes this, so set current this context to that
                 var that = this;
 
@@ -112,6 +114,8 @@ define(['jquery','underscore','app','d3','components/networkchart/charts/cloudCh
                         vpc.set("numberOfSubnets", numOfSubnetsInVpc);
 
                 });
+
+                svgHeight = awsCloudChartStartYPosition + cloudChartHeight + rectTopPadding;
 
                 that.regionList.forEach(function(regionArea, index, array){
                     if(regionArea.get("numberOfInstances") > 0){
@@ -148,10 +152,10 @@ define(['jquery','underscore','app','d3','components/networkchart/charts/cloudCh
                         regionAreaWidth = regionParentWidth - 20;
 
                         if(index === 0){
-                            regionAreaStartYPosition =  awsCloudChartStartYPosition + 75 + rectTopPadding;
+                            regionAreaStartYPosition =  awsCloudChartStartYPosition + cloudChartHeight + rectTopPadding;
                         }
                         else{
-                            regionAreaStartYPosition =  awsCloudChartStartYPosition + 75 + (awsInstanceRectHeight * array[index-1].get("numberOfInstances"))/2 + rectTopPadding;
+                            regionAreaStartYPosition =  awsCloudChartStartYPosition + cloudChartHeight + (awsInstanceRectHeight * array[index-1].get("numberOfInstances"))/2 + rectTopPadding;
                         }
 
                         //store region rect dimensions for later use

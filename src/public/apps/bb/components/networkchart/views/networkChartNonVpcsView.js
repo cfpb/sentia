@@ -50,7 +50,7 @@ define(['jquery','underscore','app','d3','components/networkchart/charts/cloudCh
                 var awsCloudChartStartXPosition = 53;
                 var awsCloudChartStartYPosition = 40;
                 var awsCloudTitleLeftPadding = 60;
-                var awsInstanceRectHeight = 120;
+                var awsInstanceRectHeight = 135;
                 var awsInstanceRectWidth = 200;
                 var awsSecurityGroupRectHeight = 50;
                 var awsIpsRectHeight = 60;
@@ -230,7 +230,7 @@ define(['jquery','underscore','app','d3','components/networkchart/charts/cloudCh
                         var nonVpcAwsInstancesChart = new NetworkChartInstances()
                             .startXPosition(startXPosition)
                             .startYPosition(startYPosition)
-                            .regionRectHeight(awsInstanceRectHeight)
+                            .instanceRectHeight(awsInstanceRectHeight)
                             .regionRectWidth(awsInstanceRectWidth)
                             .parentRectWidth(parentRectWidth)
                             .rowPosition(0)

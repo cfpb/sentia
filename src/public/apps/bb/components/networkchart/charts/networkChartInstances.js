@@ -5,7 +5,6 @@ define(["jquery", "d3","moment"], function ($, d3, moment) {
       var instanceRectHeight = 120;
       var startXPosition = 73.007973;
       var startYPosition = 80;
-      var regionRectHeight = 200;
       var regionRectWidth = 250;
       var parentRectWidth = 570;
       var regionRectTopPadding = 15;
@@ -394,13 +393,7 @@ define(["jquery", "d3","moment"], function ($, d3, moment) {
           return my;
       }
 
-      my.regionRectHeight = function (value) {
-          if (!arguments.length) return regionRectHeight;
-          regionRectHeight = value;
-          return my;
-      }
-
-      my.regionRectWidth = function (value) {
+       my.regionRectWidth = function (value) {
           if (!arguments.length) return regionRectWidth;
           regionRectWidth = value;
           return my;
