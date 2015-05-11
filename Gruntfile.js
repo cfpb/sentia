@@ -30,9 +30,9 @@ module.exports = function (grunt) {
             cf: {
                 options: {
                     targetDir: '<%= loc.src %>/public/vendor/',
-                    install: false,
+                    install: true,
                     verbose: true,
-                    cleanTargetDir: false,
+                    cleanTargetDir: true,
                     layout: function (type, component) {
                         if (type === 'img') {
                             return path.join('../public/static/img');
