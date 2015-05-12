@@ -14,7 +14,7 @@ define(["jquery", "d3","moment"], function ($, d3, moment) {
       var itemsInRow = 0;
       var newRow = false;
       var dispatch = d3.dispatch("securityGroupHover","securityGroupHoverOut","privateIpsGroupHover","privateIpsGroupHoverOut",
-      "ebsHover","ebsHoverOut","tagsHover","tagsHoverOut");
+          "privateIpsEc2ClassicGroupHover","privateIpsEc2ClassicGroupHoverOut","ebsHover","ebsHoverOut","tagsHover","tagsHoverOut");
 
       function my(selection) {
           //generate chart
@@ -125,7 +125,7 @@ define(["jquery", "d3","moment"], function ($, d3, moment) {
                   var labelSection = d3.select(this).selectAll("." + groupClassName)
                       .append("text")
                       .attr("font-size", "9px")
-                      .attr("font-family", "Verdana")
+                      .attr("font-family", "AvenirNextLTW01-Demi,Arial,sans-serif")
                       .attr("font-weight", "bold")
                       .each(function (d, i) {
                           //calculate x
@@ -335,13 +335,25 @@ define(["jquery", "d3","moment"], function ($, d3, moment) {
                       .on("mouseover", dispatch.securityGroupHover)
                       .on("mouseout", dispatch.securityGroupHoverOut);
 
-                  //Private Ips group on hover item
+                  //Private/Public Ips (EC2-Classic Ips )
                   labelSection.append("tspan")
                       .attr("x", function (d) {
                           return this.parentElement.attributes.x.value;
                       })
                       .attr("dy", "10")
-                      .text("Ip Info.")
+                      .text("EC2-Classic Ips Info.")
+                      .attr("text-decoration", "underline")
+                      .style("cursor", "pointer")
+                      .on("mouseover", dispatch.privateIpsEc2ClassicGroupHover)
+                      .on("mouseout", dispatch.privateIpsEc2ClassicGroupHoverOut);
+
+                  //Private Ips (Elastic IPs interface) group on hover item
+                  labelSection.append("tspan")
+                      .attr("x", function (d) {
+                          return this.parentElement.attributes.x.value;
+                      })
+                      .attr("dy", "10")
+                      .text("Elastic Ips Info.")
                       .attr("text-decoration", "underline")
                       .style("cursor", "pointer")
                       .on("mouseover", dispatch.privateIpsGroupHover)

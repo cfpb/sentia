@@ -17,8 +17,6 @@ define(["jquery", "d3","moment"], function ($, d3, moment) {
 
         function my(selection) {
 
-
-
             //generate chart
             selection.each(function (d) {
 
@@ -82,7 +80,7 @@ define(["jquery", "d3","moment"], function ($, d3, moment) {
                     .attr("text-anchor", "middle")
                     .attr("text-decoration","underline")
                     .attr("font-size", "9px")
-                    .attr("font-family", "Verdana")
+                    .attr("font-family", "AvenirNextLTW01-Demi,Arial,sans-serif")
                     .attr("font-weight", "bold")
                     .each(function (d, i) {
 
@@ -96,7 +94,6 @@ define(["jquery", "d3","moment"], function ($, d3, moment) {
 
 
                 _.each(selectionData,function(element,index,list){
-
                     textSection.append("tspan")
                         .attr("x", function (d) {
                             return this.parentElement.attributes.x.value;
@@ -105,7 +102,6 @@ define(["jquery", "d3","moment"], function ($, d3, moment) {
                         .attr("text-decoration","none")
                         .text(function (d) {
                             if (my.get(d,element.selectionSelector)) {
-
                                 if( my.isValidDate(my.get(d,element.selectionSelector)) === true){
                                     var formattedDate = moment(my.get(d,element.selectionSelector)).format("LLL");
                                     return element.selectionLabel.toString() + ": " + formattedDate;

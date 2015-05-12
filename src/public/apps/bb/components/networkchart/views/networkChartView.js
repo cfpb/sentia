@@ -51,10 +51,11 @@ define(['jquery','underscore','app','d3','components/networkchart/charts/cloudCh
                 var awsCloudChartStartXPosition = 53;
                 var awsCloudChartStartYPosition = 40;
                 var awsCloudTitleLeftPadding = 60;
-                var awsInstanceRectHeight = 135;
+                var awsInstanceRectHeight = 150;
                 var awsInstanceRectWidth = 200;
                 var awsSecurityGroupRectHeight = 50;
                 var awsIpsRectHeight = 60;
+                var awsIpsEc2ClassicRectHeight = 25;
                 var awsEbsRectHeight = 100;
                 var awsTagsRectHeight = 40;
                 var regionParentWidth = 630;
@@ -470,6 +471,36 @@ define(['jquery','underscore','app','d3','components/networkchart/charts/cloudCh
                         .on("privateIpsGroupHoverOut", function (d, i){
                             var nameCssClass = d.name.replace(/(:|\.|\[|\]|,)/g,"");
                             d3.select("g." + "privateIps_" + nameCssClass).remove();
+                        })
+                        .on("privateIpsEc2ClassicGroupHover", function(d,i){
+                            var nameSelector = "#" + d.name.replace(/(:|\.|\[|\]|,)/g,"");
+                            var nameCssClass = d.name.replace(/(:|\.|\[|\]|,)/g,"");
+
+                            var xPosition = parseFloat(d3.select(nameSelector).attr("x")) + 15;
+                            var yPosition = parseFloat(d3.select(nameSelector).attr("y")) + 15;
+
+                            var selectionData = [ {"selectionLabel": "Private Ip ", "selectionSelector": "privateIpAddress" } ,
+                                {"selectionLabel": "Public Ip", "selectionSelector": "publicIpAddress"}];
+
+                            var awsIpsEc2ClassicChart = new NetworkChartPopover()
+                                .startXPosition(xPosition)
+                                .startYPosition(yPosition)
+                                .regionRectHeight(awsIpsEc2ClassicRectHeight)
+                                .regionRectWidth(awsInstanceRectWidth)
+                                .textTopPadding(15)
+                                .textLeftPadding(97)
+                                .groupClassName("privateIpsEc2Classic_" + nameCssClass)
+                                .numberOfGroups(selectionData.length)
+                                .popoverLabel("Ec2 Classic Ips")
+                                .selectionData(selectionData);
+
+                            d3.select("body")
+                                .datum([d])
+                                .call(awsIpsEc2ClassicChart);
+                        })
+                        .on("privateIpsEc2ClassicGroupHoverOut", function(d,i){
+                            var nameCssClass = d.name.replace(/(:|\.|\[|\]|,)/g,"");
+                            d3.select("g." + "privateIpsEc2Classic_" + nameCssClass).remove();
                         })
                         .on("ebsHover", function (d, i){
                             var nameSelector = "#" + d.name.replace(/(:|\.|\[|\]|,)/g,"");
