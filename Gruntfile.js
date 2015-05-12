@@ -231,48 +231,6 @@ module.exports = function (grunt) {
                 files: [
                     {
                         expand: true,
-                        cwd: '<%= loc.src %>',
-                        src: [
-                            // HTML files
-                            '*.html'
-                        ],
-                        dest: '<%= loc.dist %>'
-                    },
-                    {
-                        expand: true,
-                        src: [
-                            // node file
-                            'server.js'
-                        ],
-                        dest: '<%= loc.dist %>'
-                    },
-                    {
-                        expand: true,
-                        src: [
-                            // node route files
-                            'routes/*.js'
-                        ],
-                        dest: '<%= loc.dist %>'
-                    },
-                    {
-                        expand: true,
-                        src: [
-                            // node view files
-                            'views/*.html'
-                        ],
-                        dest: '<%= loc.dist %>'
-                    },
-                    {
-                        expand: true,
-                        cwd: 'node_modules',
-                        src: [
-                            // node modules
-                            '**/*'
-                        ],
-                        dest: '<%= loc.dist %>/node_modules'
-                    },
-                    {
-                        expand: true,
                         cwd: 'src/public/apps',
                         src: [
                             '**/*'
