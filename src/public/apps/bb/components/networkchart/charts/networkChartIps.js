@@ -76,9 +76,6 @@ define(["jquery", "d3"], function ($, d3) {
                         })
                         .attr("text-anchor", "middle")
                         .attr("text-decoration","underline")
-                        .attr("font-size", "9px")
-                        .attr("font-family", "Verdana")
-                        .attr("font-weight", "bold")
                         .each(function (d, i) {
 
                             //set x, y attribute

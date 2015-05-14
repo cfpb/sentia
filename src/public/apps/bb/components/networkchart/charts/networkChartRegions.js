@@ -65,7 +65,6 @@ define(["jquery", "d3"], function ($, d3) {
             d3.select(this).selectAll("g." + groupClassName)
                 .append("text")
                 .attr("font-size","12px")
-                .attr("font-family","Verdana")
                 .attr("font-weight","bold")
                 .attr("x", function(d,i){
                     return startXPosition + titleLabelLeftPadding;
