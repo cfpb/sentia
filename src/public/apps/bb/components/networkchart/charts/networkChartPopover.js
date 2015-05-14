@@ -79,9 +79,6 @@ define(["jquery", "d3","moment"], function ($, d3, moment) {
                     })
                     .attr("text-anchor", "middle")
                     .attr("text-decoration","underline")
-                    .attr("font-size", "9px")
-                    .attr("font-family", "AvenirNextLTW01-Demi,Arial,sans-serif")
-                    .attr("font-weight", "bold")
                     .each(function (d, i) {
 
                         //set x, y attribute

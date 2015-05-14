@@ -124,9 +124,7 @@ define(["jquery", "d3","moment"], function ($, d3, moment) {
 
                   var labelSection = d3.select(this).selectAll("." + groupClassName)
                       .append("text")
-                      .attr("font-size", "9px")
-                      .attr("font-family", "AvenirNextLTW01-Demi,Arial,sans-serif")
-                      .attr("font-weight", "bold")
+                      .attr("class", groupClassName)
                       .each(function (d, i) {
                           //calculate x
                           var finalXPosition = 0;
