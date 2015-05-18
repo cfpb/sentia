@@ -43,6 +43,7 @@ src/public/static/css/capital-framework.less
 dist/public/
 dist/static/
 dist/*.html
+npm-debug.log
 
 # Local Settings #
 ##################
