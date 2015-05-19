@@ -47,7 +47,16 @@ define(["jquery", "d3","moment"], function ($, d3, moment) {
                           }
                       })
                       .append("rect")
-                      .style(rectStyle)
+                      .style("opacity",0.90946499999999997)
+                      .style("fill", function (d,i){
+                          if((d.state.name !== undefined)&& (d.state.name === "stopped")) {
+                              return "#ff0000";
+                          }
+                          else{
+                              return "#f68d00";
+                          }
+                      })
+                      .style("fill-opacity",1)
                       .attr("width", regionRectWidth)
                       .attr("height", function (d, i) {
 
@@ -229,7 +238,7 @@ define(["jquery", "d3","moment"], function ($, d3, moment) {
                       .attr("dy", "10")
                       .text(function (d) {
                           if (d.launchTime) {
-                              var formattedLaunchDate = moment(d.launchTime).format("LLL");
+                              var formattedLaunchDate = moment(d.launchTime).format("M/D/YYYY h:MM:ss A");
                               return "Launched: " + formattedLaunchDate;
                           }
                           else {
