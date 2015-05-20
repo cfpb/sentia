@@ -7,8 +7,6 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-var routes = require('./routes/index');
-
 var app = express();
 
 var port = process.env.PORT || '3000';
@@ -45,7 +43,9 @@ hbs.registerHelper('block', function(name) {
     return val;
 });
 
-app.use('/', routes);
+// routes
+app.use('/', require('./routes/index'));
+app.use('/api', require('./routes/api'));
 
 // catch 404 and forward to error handlers
 app.use(function(req, res, next) {
