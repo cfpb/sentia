@@ -295,7 +295,7 @@ module.exports = function (grunt) {
         },
         casper : {
             frontend : {
-                src: ['test/client/frontend_networkcharthome_spec.js'],
+                src: ['test/client/*.js'],
                 options : {
                     test : true,
                     verbose: false,
