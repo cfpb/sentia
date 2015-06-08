@@ -282,6 +282,45 @@ module.exports = function (grunt) {
                 configFile: 'karma.conf.js'
             }
         },
+        mochacli: {
+            options: {
+                ui: 'bdd',
+                require: ['should','chai','sinon'],
+                bail: true,
+                env: {
+                    NODE_TLS_REJECT_UNAUTHORIZED: 0
+                }
+            },
+            all: ['test/server_spec.js']
+        },
+        casper : {
+            frontend : {
+                src: ['test/client/frontend_networkcharthome_spec.js'],
+                options : {
+                    test : true,
+                    verbose: false,
+                    'log-level': 'error',
+                    'ignore-ssl-errors': true,
+                    'ssl-protocol': 'tlsv1',
+                    'fail-fast':false
+                }
+            }
+        },
+        express: {
+            options: {
+                // output: "Express server listening "
+            },
+            dev: {
+                options: {
+                    script: 'server.js'
+                }
+            },
+            test: {
+                options: {
+                    script: 'server.js'
+                }
+            }
+        },
 
         /**
          * JSHint: https://github.com/gruntjs/grunt-contrib-jshint
@@ -346,11 +385,18 @@ module.exports = function (grunt) {
      */
     grunt.loadNpmTasks('grunt-ng-annotate');
     grunt.loadNpmTasks('grunt-karma');
+    grunt.loadNpmTasks('grunt-mocha-cli');
+    grunt.loadNpmTasks('grunt-casper');
+    grunt.loadNpmTasks('grunt-express-server');
     grunt.registerTask('compile-cf', ['bower:cf', 'concat:cf-less']);
     grunt.registerTask('css', ['less', 'autoprefixer', 'legacssy', 'cssmin', 'usebanner:css']);
     grunt.registerTask('js', ['concat:js', 'uglify', 'usebanner:js']);
     grunt.registerTask('test', ['jshint']);
-    grunt.registerTask('build', ['test', 'karma', 'ngAnnotate', 'css', 'js', 'copy']);
+    grunt.registerTask('testServerSide',['mochacli']);
+    grunt.registerTask('frontEndTest',['karma','casper:frontend']);
+    grunt.registerTask('frontAndServerSideTest','This will run tests by starting up express (sentia), run front-end tests,  stop express (sentia), run server side tests',
+        ['express:test:start', 'karma','casper:frontend','test','express:test:stop','mochacli']);
+    grunt.registerTask('build', ['frontAndServerSideTest', 'ngAnnotate', 'css', 'js', 'copy']);
     grunt.registerTask('default', ['build']);
 
 

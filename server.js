@@ -107,7 +107,10 @@ function onListening() {
     console.log('Listening on ' + bind);
 }
 
-
+//for testing server routes
+module.exports = {
+    app: app
+};
 
 
 
