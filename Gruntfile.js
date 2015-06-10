@@ -29,13 +29,13 @@ module.exports = function (grunt) {
         bower: {
             cf: {
                 options: {
-                    targetDir: '<%= loc.src %>/vendor/',
-                    install: false,
+                    targetDir: '<%= loc.src %>/public/vendor/',
+                    install: true,
                     verbose: true,
-                    cleanTargetDir: false,
+                    cleanTargetDir: true,
                     layout: function (type, component) {
                         if (type === 'img') {
-                            return path.join('../static/img');
+                            return path.join('../public/static/img');
                         } else if (type === 'fonts') {
                             return path.join('../static/fonts');
                         } else {
@@ -52,7 +52,7 @@ module.exports = function (grunt) {
         ngAnnotate: {
             sentia: {
                 files: {
-                    '<%= loc.src %>/static/js/annotatedApp.js': ['<%= loc.src %>/static/js/app.js']
+                    '<%= loc.src %>/public/apps/ng/annotatedApp.js': ['<%= loc.src %>/public/apps/ng/app.js']
                 },
             }
         },
@@ -65,24 +65,24 @@ module.exports = function (grunt) {
         concat: {
             'cf-less': {
                 src: [
-                    '<%= loc.src %>/vendor/cf-*/*.less',
-                    '!<%= loc.src %>/vendor/cf-core/*.less',
-                    '<%= loc.src %>/vendor/cf-core/cf-core.less'
+                    '<%= loc.src %>/public/vendor/cf-*/*.less',
+                    '!<%= loc.src %>/public/vendor/cf-core/*.less',
+                    '<%= loc.src %>/public/vendor/cf-core/cf-core.less'
                 ],
-                dest: '<%= loc.src %>/static/css/capital-framework.less',
+                dest: '<%= loc.src %>/public/static/css/capital-framework.less',
             },
             js: {
                 src: [
-                    '<%= loc.src %>/vendor/jquery/jquery.js',
-                    '<%= loc.src %>/vendor/underscore/underscore-min.js',
-                    '<%= loc.src %>/vendor/jquery.easing/jquery.easing.js',
-                    '<%= loc.src %>/vendor/cf-*/*.js',
-                    '<%= loc.src %>/vendor/d3-tip/index.js',
+                    '<%= loc.src %>/public/vendor/jquery/jquery.js',
+                    '<%= loc.src %>/public/vendor/underscore/underscore-min.js',
+                    '<%= loc.src %>/public/vendor/jquery.easing/jquery.easing.js',
+                    '<%= loc.src %>/public/vendor/cf-*/*.js',
+                    '<%= loc.src %>/public/vendor/d3-tip/index.js',
                     // '<%= loc.src %>/vendor/d3/d3.min.js',
-                    '!<%= loc.src %>/vendor/cf-*/Gruntfile.js',
-                    '<%= loc.src %>/static/js/app.js'
+                    '!<%= loc.src %>/public/vendor/cf-*/Gruntfile.js',
+                    '<%= loc.src %>/public/apps/ng/app.js'
                 ],
-                dest: '<%= loc.dist %>/static/js/main.js'
+                dest: '<%= loc.dist %>/public/apps/ng/main.js'
             }
         },
         /**
@@ -95,10 +95,10 @@ module.exports = function (grunt) {
                 options: {
                     // The src/vendor paths are needed to find the CF components' files.
                     // Feel free to add additional paths to the array passed to `concat`.
-                    paths: grunt.file.expand('src/vendor/*').concat([])
+                    paths: grunt.file.expand('src/public/vendor/*').concat([])
                 },
                 files: {
-                    '<%= loc.dist %>/static/css/main.css': ['<%= loc.src %>/static/css/main.less']
+                    '<%= loc.dist %>/public/static/css/main.css': ['<%= loc.src %>/public/static/css/main.less']
                 }
             }
         },
@@ -117,7 +117,7 @@ module.exports = function (grunt) {
             main: {
                 // Prefix `static/css/main.css` and overwrite.
                 expand: true,
-                src: ['<%= loc.dist %>/static/css/main.css']
+                src: ['<%= loc.dist %>/public/static/css/main.css']
             },
         },
 
@@ -138,8 +138,8 @@ module.exports = function (grunt) {
             //   dest: 'static/js/html5shiv-printshiv.js'
             // },
             js: {
-                src: ['<%= loc.dist %>/static/js/main.js'],
-                dest: '<%= loc.dist %>/static/js/main.min.js'
+                src: ['<%= loc.dist %>/public/apps/ng/main.js'],
+                dest: '<%= loc.dist %>/public/apps/ng/main.min.js'
             }
         },
 
@@ -189,7 +189,7 @@ module.exports = function (grunt) {
                     processImport: false
                 },
                 files: {
-                    '<%= loc.dist %>/static/css/main.min.css': ['<%= loc.dist %>/static/css/main.css'],
+                    '<%= loc.dist %>/public/static/css/main.min.css': ['<%= loc.dist %>/public/static/css/main.css'],
                 }
             },
             'ie-alternate': {
@@ -197,7 +197,7 @@ module.exports = function (grunt) {
                     processImport: false
                 },
                 files: {
-                    '<%= loc.dist %>/static/css/main.ie.min.css': ['<%= loc.dist %>/static/css/main.ie.css'],
+                    '<%= loc.dist %>/public/static/css/main.ie.min.css': ['<%= loc.dist %>/public/static/css/main.ie.css'],
                 }
             }
         },
@@ -216,7 +216,7 @@ module.exports = function (grunt) {
                     legacyWidth: 60
                 },
                 files: {
-                    '<%= loc.dist %>/static/css/main.ie.css': '<%= loc.dist %>/static/css/main.css'
+                    '<%= loc.dist %>/public/static/css/main.ie.css': '<%= loc.dist %>/public/static/css/main.css'
                 }
             }
         },
@@ -231,31 +231,37 @@ module.exports = function (grunt) {
                 files: [
                     {
                         expand: true,
-                        cwd: '<%= loc.src %>',
+                        cwd: 'src/public/apps',
                         src: [
-                            // HTML files
-                            '*.html',
+                            '**/*'
                         ],
-                        dest: '<%= loc.dist %>'
+                        dest: '<%= loc.dist %>/public/apps'
                     },
                     {
                         expand: true,
-                        cwd: '<%= loc.src %>/static/js',
+                        cwd: 'src/public/vendor',
                         src: [
-                            // Javascript files
-                            '*.js',
+                            '**/*'
                         ],
-                        dest: '<%= loc.dist %>/static/js'
+                        dest: '<%= loc.dist %>/public/vendor'
                     },
                     {
                         expand: true,
-                        cwd: '<%= loc.src %>/static',
+                        cwd: '<%= loc.src %>/public/static',
                         src: [
                             // Fonts
                             'fonts/*',
-                            'images/*',
+                            'images/*'
                         ],
-                        dest: '<%= loc.dist %>/static'
+                        dest: '<%= loc.dist %>/public/static'
+                    },
+                    {
+                        expand: true,
+                        cwd: '<%= loc.src %>/public/local',
+                        src: [
+                            '**/*'
+                        ],
+                        dest: '<%= loc.dist %>/public/local'
                     },
                     {
                         expand: true,
@@ -265,7 +271,7 @@ module.exports = function (grunt) {
                             'vendor/html5shiv/html5shiv-printshiv.min.js',
                             'vendor/box-sizing-polyfill/boxsizing.htc'
                         ],
-                        dest: '<%= loc.dist %>/static'
+                        dest: '<%= loc.dist %>/public/static'
                     }
                 ]
             }
@@ -274,6 +280,45 @@ module.exports = function (grunt) {
         karma: {
             unit: {
                 configFile: 'karma.conf.js'
+            }
+        },
+        mochacli: {
+            options: {
+                ui: 'bdd',
+                require: ['should','chai','sinon'],
+                bail: true,
+                env: {
+                    NODE_TLS_REJECT_UNAUTHORIZED: 0
+                }
+            },
+            all: ['test/server_spec.js']
+        },
+        casper : {
+            frontend : {
+                src: ['test/client/*.js'],
+                options : {
+                    test : true,
+                    verbose: false,
+                    'log-level': 'error',
+                    'ignore-ssl-errors': true,
+                    'ssl-protocol': 'tlsv1',
+                    'fail-fast':false
+                }
+            }
+        },
+        express: {
+            options: {
+                // output: "Express server listening "
+            },
+            dev: {
+                options: {
+                    script: 'server.js'
+                }
+            },
+            test: {
+                options: {
+                    script: 'server.js'
+                }
             }
         },
 
@@ -311,7 +356,7 @@ module.exports = function (grunt) {
                     EventEmitter: true
                 }
             },
-            all: ['<%= loc.src %>/static/js/app.js']
+            all: ['<%= loc.src %>/public/apps/ng/app.js','<%= loc.src %>/public/apps/bb/router.js', '<%= loc.src %>/public/apps/bb/components/networkchart/app.js']
         },
 
         /**
@@ -322,7 +367,8 @@ module.exports = function (grunt) {
          */
         watch: {
             default: {
-                files: ['Gruntfile.js', '<%= loc.src %>/static/css/**/*.less', '<%= loc.src %>/static/js/**/*.js', '<%= loc.src %>/*.html'],
+                files: ['Gruntfile.js', '<%= loc.src %>/public/static/css/**/*.less', '<%= loc.src %>/public/apps/**/*.js',
+                    '<%= loc.src %>/*.html'],
                 tasks: ['default']
             }
         }
@@ -339,11 +385,18 @@ module.exports = function (grunt) {
      */
     grunt.loadNpmTasks('grunt-ng-annotate');
     grunt.loadNpmTasks('grunt-karma');
+    grunt.loadNpmTasks('grunt-mocha-cli');
+    grunt.loadNpmTasks('grunt-casper');
+    grunt.loadNpmTasks('grunt-express-server');
     grunt.registerTask('compile-cf', ['bower:cf', 'concat:cf-less']);
     grunt.registerTask('css', ['less', 'autoprefixer', 'legacssy', 'cssmin', 'usebanner:css']);
     grunt.registerTask('js', ['concat:js', 'uglify', 'usebanner:js']);
     grunt.registerTask('test', ['jshint']);
-    grunt.registerTask('build', ['test', 'karma', 'ngAnnotate', 'css', 'js', 'copy']);
+    grunt.registerTask('testServerSide',['mochacli']);
+    grunt.registerTask('frontEndTest',['karma','casper:frontend']);
+    grunt.registerTask('frontAndServerSideTest','This will run tests by starting up express (sentia), run front-end tests,  stop express (sentia), run server side tests',
+        ['express:test:start', 'karma','casper:frontend','test','express:test:stop','mochacli']);
+    grunt.registerTask('build', ['frontAndServerSideTest', 'ngAnnotate', 'css', 'js', 'copy']);
     grunt.registerTask('default', ['build']);
 
 

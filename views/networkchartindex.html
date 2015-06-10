@@ -1,0 +1,32 @@
+{{#extend "stylesheets"}}
+<!--[if lt IE 9]>      <link rel="stylesheet" href="/public/static/css/main.ie.min.css"> <![endif]-->
+<!--[if gt IE 8]><!--> <link rel="stylesheet" href="/public/static/css/main.min.css"> <!--<![endif]-->
+{{/extend}}
+{{#extend "scripts"}}
+<script type="text/javascript">
+    //To prevent ie from throw errors when console.log is used (console does not exist in ie browser but does exist in firefox and chrome
+    (function () {
+        if (typeof console == "undefined") {
+            console = { log: function() {} }
+        }
+    })();
+</script>
+<script type="text/javascript" data-main="/public/apps/bb/config.js" src="/public/vendor/requirejs/require.js">
+</script>
+{{/extend}}
+
+<header class="wrapper wrapper__match-content" role="banner">
+    <div class="block block__sub">
+        <h1 id="pageHeader" class="superheader">Sentia</h1>
+        <h6 id="pageSubHeader">Enlightenment for your Environment</h6>
+    </div>
+</header>
+
+<div class="content_bar"></div>
+<div>
+    <div id="main_container" name="main_container">
+        <div>
+            Network Chart
+        </div>
+    </div>
+</div>

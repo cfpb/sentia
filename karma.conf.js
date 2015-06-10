@@ -15,11 +15,11 @@ module.exports = function (config) {
 
         // list of files / patterns to load in the browser
         files: [
-            {pattern: 'src/vendor/angular/angular.js', included: true},
-            {pattern: 'src/vendor/angular-mocks/angular-mocks.js', included: true},
-            {pattern: 'src/vendor/jquery/jquery.js', included: true},
-            {pattern: 'src/vendor/cf-*/*.js', included: true},
-            {pattern: 'src/static/js/*.js', included: true},
+            {pattern: 'src/public/vendor/angular/angular.js', included: true},
+            {pattern: 'src/public/vendor/angular-mocks/angular-mocks.js', included: true},
+            {pattern: 'src/public/vendor/jquery/jquery.js', included: true},
+            {pattern: 'src/public/vendor/cf-*/*.js', included: true},
+            {pattern: 'src/public/apps/ng/*.js', included: true},
             {pattern: 'test/**/*.test.js', included: true},
             'test/test-main.js'
         ],

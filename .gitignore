@@ -38,9 +38,17 @@ node_modules/
 bower_components/
 .grunt/
 src/vendor/
+src/public/vendor/
+src/public/static/css/capital-framework.less
+dist/public/
+dist/static/
+dist/*.html
+npm-debug.log
 
 # Local Settings #
 ##################
 local/
-dist/local/
+dist/
 sentia-legacy/
+.idea/
+

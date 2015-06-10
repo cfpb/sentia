@@ -14,6 +14,8 @@ Sentia provides a simple way for stakeholders across your teams to see instructu
 * ElasticSearch
 #### Front-end (Current Contents of Repo)
 * CFPB Capital Framework
+* Angular.js
+* Backbone.js
 * D3.js
 * Node / Bower / Grunt Build Stack
 * LESS
@@ -35,8 +37,8 @@ If specific versions of other software are required, or or known not to work, ca
 * `bower install`
 * `grunt build`
 * Create a localVars.js file in `/dist/local/` and add the line `var serverUrl = [Your Edda IP Address]:[Edda Port]/`, replacing the bracketed values with your internal server URLs
-* `python -m SimpleHTTPServer` in the `/dist` directory
-* Your app should be running on localhost:8000
+* Node Application running on localhost:3000. (Use server.js to run Node application)
+
 
 NOTE: Requires a running Netflix Edda instance.
 
