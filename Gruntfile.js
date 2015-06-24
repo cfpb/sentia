@@ -287,11 +287,12 @@ module.exports = function (grunt) {
                 ui: 'bdd',
                 require: ['should','chai','sinon'],
                 bail: true,
+                reporter: 'spec',
                 env: {
                     NODE_TLS_REJECT_UNAUTHORIZED: 0
                 }
             },
-            all: ['test/server_spec.js']
+            all: ['test/server/server_spec.js']
         },
         casper : {
             frontend : {

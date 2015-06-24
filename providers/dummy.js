@@ -28,6 +28,6 @@ module.exports = {
     // Detect errors from data source and forward on
     //if (err) return callback(err);
     callback(null, instances)
-  },
+  }
   
 };
