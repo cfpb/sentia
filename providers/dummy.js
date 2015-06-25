@@ -28,6 +28,48 @@ module.exports = {
     // Detect errors from data source and forward on
     //if (err) return callback(err);
     callback(null, instances)
-  }
+  },
+    availabilityzones: function(params, callback) {
+        var availabilityZones = [
+            {
+                id: 'zone_1',
+                name: 'us-west-1a'
+            },
+            {
+                id: 'zone_2',
+                name: 'us-west-1b'
+            }
+        ];
+
+        callback(null, availabilityZones);
+    },
+
+    vpcs: function(){
+        var vpcs = [
+            {
+             id: 'vpc_1',
+                name: 'extranet_vpc'
+            },
+            {
+                id: 'vpc_2',
+                name: 'intranet_vpc'
+            }
+        ];
+
+        callback(null, vpcs);
+    },
+
+    subnets: function(){
+        var subnets = [{
+                id: 'subnet_1',
+                name: 'extranet_subnet_dbs'
+            },
+            {
+                id: 'subnet_2',
+                name: 'intranet_subnet_web'
+            }];
+
+        callback(null, subnets);
+    }
   
 };

@@ -62,7 +62,7 @@ describe('Server', function(){
         });
     });
 
-    describe('Get instances via api/instances/', function() {
+    describe('Get instances via api/instances/ from all providers', function() {
         it('should respond to GET', function(done){
             sentiaInfoRequest
                 .get('/api/instances/')
@@ -73,6 +73,44 @@ describe('Server', function(){
 
         });
     });
+
+
+    describe('Get availabilityzones via api/availabilityzones/ from all providers', function() {
+        it('should respond to GET', function(done){
+            sentiaInfoRequest
+                .get('/api/availabilityzones/')
+                .end(function(err, res){
+                    res.text.should.not.equal(undefined);
+                    done();
+                });
+
+        });
+    });
+
+    describe('Get vpcs via api/vpcs/ from all providers', function() {
+        it('should respond to GET', function(done){
+            sentiaInfoRequest
+                .get('/api/vpcs/')
+                .end(function(err, res){
+                    res.text.should.not.equal(undefined);
+                    done();
+                });
+
+        });
+    });
+
+    describe('Get subnets via api/subnets/ from all providers', function() {
+        it('should respond to GET', function(done){
+            sentiaInfoRequest
+                .get('/api/subnets/')
+                .end(function(err, res){
+                    res.text.should.not.equal(undefined);
+                    done();
+                });
+
+        });
+    });
+
 
     describe('Get instances via not existing path , api/instances/xyz/', function() {
         it('should respond to GET with 500', function(done){
@@ -86,8 +124,8 @@ describe('Server', function(){
 
         });
     });
-    //api/instances?filter={"providers": ["aws"],"data.placement.availabilityZone":["us-east-1a"],"data.securityGroups":[{"groupName":"ext_mgt_lin"}] }
-    describe('Get instances via api/instances?filter JSON syntax', function() {
+
+    describe('Get instances via api/instances?filter using JSON syntax', function() {
         it('should respond to GET with 200', function(done){
             sentiaInfoRequest
                 .get('/api/instances?filter={"providers": ["aws"],"data.placement.availabilityZone":["us-east-1a"] }')
@@ -95,8 +133,39 @@ describe('Server', function(){
                     res.status.should.equal(200);
                     done();
                 });
+        });
+    });
 
+    describe('Get instances via api/availabilityzones?filter using JSON syntax', function() {
+        it('should respond to GET with 200', function(done){
+            sentiaInfoRequest
+                .get('/api/availabilityzones?filter={"providers": ["aws"] }')
+                .end(function(err, res){
+                    res.status.should.equal(200);
+                    done();
+                });
+        });
+    });
 
+    describe('Get instances via api/vpcs?filter using JSON syntax', function() {
+        it('should respond to GET with 200', function(done){
+            sentiaInfoRequest
+                .get('/api/vpcs?filter={"providers": ["aws"] }')
+                .end(function(err, res){
+                    res.status.should.equal(200);
+                    done();
+                });
+        });
+    });
+
+    describe('Get instances via api/subnets?filter using JSON syntax', function() {
+        it('should respond to GET with 200', function(done){
+            sentiaInfoRequest
+                .get('/api/subnets?filter={"providers": ["aws"] }')
+                .end(function(err, res){
+                    res.status.should.equal(200);
+                    done();
+                });
         });
     });
 

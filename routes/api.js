@@ -28,7 +28,7 @@ fs.readdir(path.join(__dirname, '../providers'), function(err, contents) {
 // Define API routes
 
 // List of supported API calls
-var supported_actions = ['instances']
+var supported_actions = ['instances','availabilityzones','vpcs','subnets'];
 
 
 //Api Get call for specific list of providers (data sources) or call to All Providers
