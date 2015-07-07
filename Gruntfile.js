@@ -63,14 +63,6 @@ module.exports = function (grunt) {
          * Concatenate cf-* Less files prior to compiling them.
          */
         concat: {
-            'cf-less': {
-                src: [
-                    '<%= loc.src %>/public/vendor/cf-*/*.less',
-                    '!<%= loc.src %>/public/vendor/cf-core/*.less',
-                    '<%= loc.src %>/public/vendor/cf-core/cf-core.less'
-                ],
-                dest: '<%= loc.src %>/public/static/css/capital-framework.less',
-            },
             js: {
                 src: [
                     '<%= loc.src %>/public/vendor/jquery/jquery.js',
@@ -389,7 +381,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-mocha-cli');
     grunt.loadNpmTasks('grunt-casper');
     grunt.loadNpmTasks('grunt-express-server');
-    grunt.registerTask('compile-cf', ['bower:cf', 'concat:cf-less']);
+    grunt.registerTask('compile-cf', ['bower:cf']);
     grunt.registerTask('css', ['less', 'autoprefixer', 'legacssy', 'cssmin', 'usebanner:css']);
     grunt.registerTask('js', ['concat:js', 'uglify', 'usebanner:js']);
     grunt.registerTask('test', ['jshint']);
