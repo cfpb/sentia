@@ -6,12 +6,17 @@
 // Project-specific Less rules go after the imports.
 
 // Import Normalize, a Capital Framework dependency and an all-around best practice.
-@import (less) "../../vendor/normalize-css/normalize.css";
-@import (less) "../../vendor/normalize-legacy-addon/normalize-legacy-addon.css";
+@import (less) "../../../vendor/normalize-css/normalize.css";
+@import (less) "../../../vendor/normalize-legacy-addon/normalize-legacy-addon.css";
 
-// Import the combined Capital Framework component file that was created by `grunt compile-cf`.
-@import (less) "capital-framework.less";
-
+// Import the  Capital Framework component files
+@import (less) "../../../vendor/cf-core/src/cf-core.less";
+@import (less) "../../../vendor/cf-buttons/src/cf-buttons.less";
+@import (less) "../../../vendor/cf-grid/src/cf-grid.less";
+@import (less) "../../../vendor/cf-layout/src/cf-layout.less";
+@import (less) "../../../vendor/cf-expandables/src/less/cf-expandables.less";
+@import (less) "../../../vendor/cf-pagination/src/cf-pagination.less";
+@import (less) "../../../vendor/cf-icons/src/less/icons.less";
 // Import the brand color palette.
 @import (less) "brand-palette.less";
 
