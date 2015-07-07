@@ -395,9 +395,8 @@ module.exports = function (grunt) {
     grunt.registerTask('test', ['jshint']);
     grunt.registerTask('testServerSide',['mochacli']);
     grunt.registerTask('frontEndTest',['karma','casper:frontend']);
-    grunt.registerTask('frontAndServerSideTest','This will run tests by starting up express (sentia), run front-end tests,  stop express (sentia), run server side tests',
-        ['express:test:start', 'karma','casper:frontend','test','express:test:stop','mochacli']);
-    grunt.registerTask('build', ['frontAndServerSideTest', 'ngAnnotate', 'css', 'js', 'copy']);
+    grunt.registerTask('frontAndServerSideTest','This will run tests by starting up express (sentia), run front-end tests,  stop express (sentia), run server side tests',['express:test:start', 'karma','casper:frontend','test','express:test:stop','mochacli']);
+    grunt.registerTask('build', [ 'ngAnnotate', 'css', 'js', 'copy']);
     grunt.registerTask('default', ['build']);
 
 
