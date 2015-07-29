@@ -10,7 +10,11 @@
         root: '/',
         isIE: /msie/i.test(navigator.userAgent) && !window.opera, //easy way to determine if ie
         isLowerIE8: (document.all && !document.querySelector) ? true: false,  //ie less than ie 8
-        dispatcher: dispatcher
+        dispatcher: dispatcher,
+        //local developer laptop
+        //eddaBaseUrl: 'http://localhost:8080/edda/api/v2/'
+        //demo server
+        eddaBaseUrl: 'http://10.153.97.223:8080/edda/api/v2/'
     };
 
     //localize or create a new Javascript Template Object
