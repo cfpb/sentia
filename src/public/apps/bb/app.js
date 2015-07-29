@@ -14,7 +14,7 @@
         //local developer laptop
         //eddaBaseUrl: 'http://localhost:8080/edda/api/v2/'
         //demo server
-        eddaBaseUrl: 'http://10.153.97.223:8080/edda/api/v2/'
+        eddaBaseUrl: 'http://sentia.demo.cfpb.gov/eddahome/edda/api/v2/'
     };
 
     //localize or create a new Javascript Template Object
