@@ -19,6 +19,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'html');
 app.engine('html', require('hbs').__express);
 
+app.engine('jade', require('jade').__express);
 
 app.use(logger('dev'));
 app.use(bodyParser.json());
