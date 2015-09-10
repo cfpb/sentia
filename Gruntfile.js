@@ -20,7 +20,18 @@ module.exports = function (grunt) {
             src: 'src',
             dist: 'dist'
         },
-
+        bower_concat: {
+            bower: {
+                dest: '<%=loc.src %>/public/apps/reports/bower-report.js',
+                cssDest: '<%=loc.src %>/public/static/css/bower-report.css',
+                include: [
+                    'jquery',
+                    'async',
+                    'bootstrap',
+                    'lodash'
+                ],
+            }
+        },
         /**
          * Bower: https://github.com/yatskevich/grunt-bower-task
          *
@@ -44,6 +55,7 @@ module.exports = function (grunt) {
                     }
                 }
             }
+
         },
 
         /**
@@ -90,7 +102,8 @@ module.exports = function (grunt) {
                     paths: grunt.file.expand('src/public/vendor/*').concat([])
                 },
                 files: {
-                    '<%= loc.dist %>/public/static/css/main.css': ['<%= loc.src %>/public/static/css/main.less']
+                    '<%= loc.dist %>/public/static/css/main.css': ['<%= loc.src %>/public/static/css/main.less'],
+                    '<%= loc.dist %>/public/static/css/main-report.css': ['<%= loc.src %>/public/static/css/main-report.less']
                 }
             }
         },
@@ -182,6 +195,8 @@ module.exports = function (grunt) {
                 },
                 files: {
                     '<%= loc.dist %>/public/static/css/main.min.css': ['<%= loc.dist %>/public/static/css/main.css'],
+                    '<%= loc.dist %>/public/static/css/main-report.min.css': ['<%= loc.dist %>/public/static/css/main-report.css'],
+                    '<%= loc.dist %>/public/static/css/bower-report.min.css': ['<%= loc.dist %>/public/static/css/bower-report.css'],
                 }
             },
             'ie-alternate': {
@@ -190,6 +205,8 @@ module.exports = function (grunt) {
                 },
                 files: {
                     '<%= loc.dist %>/public/static/css/main.ie.min.css': ['<%= loc.dist %>/public/static/css/main.ie.css'],
+                    '<%= loc.dist %>/public/static/css/main-report.ie.min.css': ['<%= loc.dist %>/public/static/css/main-report.ie.css'],
+                    '<%= loc.dist %>/public/static/css/bower-report.ie.min.css': ['<%= loc.dist %>/public/static/css/bower-report.ie.css']
                 }
             }
         },
@@ -376,12 +393,13 @@ module.exports = function (grunt) {
     /**
      * Create custom task aliases and combinations.
      */
+    grunt.loadNpmTasks('grunt-bower-concat');
     grunt.loadNpmTasks('grunt-ng-annotate');
     grunt.loadNpmTasks('grunt-karma');
     grunt.loadNpmTasks('grunt-mocha-cli');
     grunt.loadNpmTasks('grunt-casper');
     grunt.loadNpmTasks('grunt-express-server');
-    grunt.registerTask('compile-cf', ['bower:cf']);
+    grunt.registerTask('compile-cf', ['bower:cf','bower_concat']);
     grunt.registerTask('css', ['less', 'autoprefixer', 'legacssy', 'cssmin', 'usebanner:css']);
     grunt.registerTask('js', ['concat:js', 'uglify', 'usebanner:js']);
     grunt.registerTask('test', ['jshint']);
