@@ -6,6 +6,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var settings = require("./settings.js");
 
 var app = express();
 
@@ -17,6 +18,7 @@ app.set("trust proxy", true);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'html');
 app.engine('html', require('hbs').__express);
+
 
 app.use(logger('dev'));
 app.use(bodyParser.json());
@@ -46,6 +48,7 @@ hbs.registerHelper('block', function(name) {
 // routes
 app.use('/', require('./routes/index'));
 app.use('/api', require('./routes/api'));
+app.use('/reports', require('./routes/reports'));
 
 // catch 404 and forward to error handlers
 app.use(function(req, res, next) {
