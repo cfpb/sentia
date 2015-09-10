@@ -18,10 +18,8 @@ if (process.env.HTTP_PROXY) {
 }
 
 var templatePath = require.resolve('../views/jade/index.jade');
-var templateFn = require('jade').compileFile(templatePath);
 router.get('/', function(req, res){
-    res.write(templateFn({settings: settings}));
-    res.end();
+     res.render(templatePath, {settings: settings});
 });
 
 router.get('/vpcs', function(req, res) {
