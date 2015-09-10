@@ -25,49 +25,49 @@ router.get('/', function(req, res){
 router.get('/vpcs', function(req, res) {
     collect_regions("describeVpcs", {}, function(err, data) {
         if (err) return console.error(err);
-        res.send(data);
+        res.json(data);
     });
 });
 
 router.get('/external_ips', function(req, res) {
     collect_regions("describeAddresses", {}, function(err, data) {
         if (err) return console.error(err);
-        res.send(data);
+        res.json(data);
     });
 });
 
 router.get('/instances', function(req, res) {
     collect_regions("describeInstances", {}, function(err, data) {
         if (err) return console.error(err);
-        res.send(data);
+        res.json(data);
     });
 });
 
 router.get('/instances/:inst_ids', function(req, res) {
     collect_regions("describeInstances", {InstanceIds: req.params.inst_ids.split(',')}, function(err, data) {
         if (err) return console.error(err);
-        res.send(data);
+        res.json(data);
     });
 });
 
 router.get('/security_groups', function(req, res) {
     collect_regions("describeSecurityGroups", {}, function(err, data) {
         if (err) return console.error(err);
-        res.send(data);
+        res.json(data);
     });
 });
 
 router.get('/security_groups/:group_id', function(req, res) {
     collect_regions("describeSecurityGroups", {GroupIds: [req.params.group_id]}, function(err, data) {
         if (err) return console.error(err);
-        res.send(data);
+        res.json(data);
     });
 });
 
 router.get('/subnets', function(req, res) {
     collect_regions("describeSubnets", {}, function(err, data) {
         if (err) return console.error(err);
-        res.send(data);
+        res.json(data);
     });
 });
 
