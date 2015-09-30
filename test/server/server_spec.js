@@ -63,6 +63,7 @@ describe('Server', function(){
     });
 
     describe('Get instances via api/instances/ from all providers', function() {
+        this.timeout(60000); //increase default time to 1 minute, due potentially large number of instances
         it('should respond to GET', function(done){
             sentiaInfoRequest
                 .get('/api/instances/')

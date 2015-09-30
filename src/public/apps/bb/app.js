@@ -11,10 +11,13 @@
         isIE: /msie/i.test(navigator.userAgent) && !window.opera, //easy way to determine if ie
         isLowerIE8: (document.all && !document.querySelector) ? true: false,  //ie less than ie 8
         dispatcher: dispatcher,
-        //local developer laptop
-        //eddaBaseUrl: 'http://localhost:8080/edda/api/v2/'
-        //demo server
-        eddaBaseUrl: 'http://sentia.demo.cfpb.gov/eddahome/edda/api/v2/'
+        api:
+        {
+            instancesUrl: '/api/instances/?filter={"providers": ["aws"] }',
+            availabilityZonesUrl: '/api/availabilityzones/?filter={"providers": ["aws"] }',
+            vpcsUrl:'/api/vpcs/?filter={"providers": ["aws"] }',
+            subnetsUrl:'/api/subnets/?filter={"providers": ["aws"] }'
+        }
     };
 
     //localize or create a new Javascript Template Object
