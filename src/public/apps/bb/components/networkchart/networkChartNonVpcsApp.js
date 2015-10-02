@@ -23,7 +23,7 @@ define(["app", "backbone", "d3", "components/networkchart/views/networkChartNonV
 
             //calculate # of regions  , fetch is async , so wait until done then
             //create regionCollection base on querying aws.availabilityZones
-            availabilityZoneList.url = "http://localhost:8080/edda/api/v2/aws/availabilityzones;_pp;_meta;";
+            availabilityZoneList.url = app.api.availabilityZonesUrl;
             $.when(availabilityZoneList.fetch({
                 type: "GET",
                 cache: true,
@@ -45,7 +45,7 @@ define(["app", "backbone", "d3", "components/networkchart/views/networkChartNonV
                 });
 
                 //Get Instances
-                instanceList.url = "http://localhost:8080/edda/api/v2/view/instances;_pp;_meta;";
+                instanceList.url = app.api.instancesUrl;
                 $.when(instanceList.fetch({
                     type: "GET",
                     cache: true,
@@ -83,7 +83,7 @@ define(["app", "backbone", "d3", "components/networkchart/views/networkChartNonV
 
 
 
-                    subnetList.url = "http://localhost:8080/edda/api/v2/aws/subnets;_pp;_meta;";
+                    subnetList.url = app.api.subnetsUrl;
                     $.when(subnetList.fetch({
                         type: "GET",
                         cache: true,

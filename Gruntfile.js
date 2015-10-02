@@ -20,7 +20,18 @@ module.exports = function (grunt) {
             src: 'src',
             dist: 'dist'
         },
-
+        bower_concat: {
+            bower: {
+                dest: '<%=loc.src %>/public/apps/reports/bower-report.js',
+                cssDest: '<%=loc.src %>/public/static/css/bower-report.css',
+                include: [
+                    'jquery',
+                    'async',
+                    'bootstrap',
+                    'lodash'
+                ],
+            }
+        },
         /**
          * Bower: https://github.com/yatskevich/grunt-bower-task
          *
@@ -44,6 +55,7 @@ module.exports = function (grunt) {
                     }
                 }
             }
+
         },
 
         /**
@@ -63,14 +75,6 @@ module.exports = function (grunt) {
          * Concatenate cf-* Less files prior to compiling them.
          */
         concat: {
-            'cf-less': {
-                src: [
-                    '<%= loc.src %>/public/vendor/cf-*/*.less',
-                    '!<%= loc.src %>/public/vendor/cf-core/*.less',
-                    '<%= loc.src %>/public/vendor/cf-core/cf-core.less'
-                ],
-                dest: '<%= loc.src %>/public/static/css/capital-framework.less',
-            },
             js: {
                 src: [
                     '<%= loc.src %>/public/vendor/jquery/jquery.js',
@@ -95,10 +99,11 @@ module.exports = function (grunt) {
                 options: {
                     // The src/vendor paths are needed to find the CF components' files.
                     // Feel free to add additional paths to the array passed to `concat`.
-                    paths: grunt.file.expand('src/public/vendor/*').concat([])
+                    paths: grunt.file.expand('src/vendor/*').concat([])
                 },
                 files: {
-                    '<%= loc.dist %>/public/static/css/main.css': ['<%= loc.src %>/public/static/css/main.less']
+                    '<%= loc.dist %>/public/static/css/main.css': ['<%= loc.src %>/public/static/css/main.less'],
+                    '<%= loc.dist %>/public/static/css/main-report.css': ['<%= loc.src %>/public/static/css/main-report.less']
                 }
             }
         },
@@ -190,6 +195,7 @@ module.exports = function (grunt) {
                 },
                 files: {
                     '<%= loc.dist %>/public/static/css/main.min.css': ['<%= loc.dist %>/public/static/css/main.css'],
+                    '<%= loc.dist %>/public/static/css/main-report.min.css': ['<%= loc.dist %>/public/static/css/main-report.css']
                 }
             },
             'ie-alternate': {
@@ -198,6 +204,7 @@ module.exports = function (grunt) {
                 },
                 files: {
                     '<%= loc.dist %>/public/static/css/main.ie.min.css': ['<%= loc.dist %>/public/static/css/main.ie.css'],
+                    '<%= loc.dist %>/public/static/css/main-report.ie.min.css': ['<%= loc.dist %>/public/static/css/main-report.ie.css']
                 }
             }
         },
@@ -287,11 +294,12 @@ module.exports = function (grunt) {
                 ui: 'bdd',
                 require: ['should','chai','sinon'],
                 bail: true,
+                reporter: 'spec',
                 env: {
                     NODE_TLS_REJECT_UNAUTHORIZED: 0
                 }
             },
-            all: ['test/server_spec.js']
+            all: ['test/server/server_spec.js']
         },
         casper : {
             frontend : {
@@ -383,20 +391,20 @@ module.exports = function (grunt) {
     /**
      * Create custom task aliases and combinations.
      */
+    grunt.loadNpmTasks('grunt-bower-concat');
     grunt.loadNpmTasks('grunt-ng-annotate');
     grunt.loadNpmTasks('grunt-karma');
     grunt.loadNpmTasks('grunt-mocha-cli');
     grunt.loadNpmTasks('grunt-casper');
     grunt.loadNpmTasks('grunt-express-server');
-    grunt.registerTask('compile-cf', ['bower:cf', 'concat:cf-less']);
+    grunt.registerTask('compile-cf', ['bower:cf','bower_concat']);
     grunt.registerTask('css', ['less', 'autoprefixer', 'legacssy', 'cssmin', 'usebanner:css']);
     grunt.registerTask('js', ['concat:js', 'uglify', 'usebanner:js']);
     grunt.registerTask('test', ['jshint']);
     grunt.registerTask('testServerSide',['mochacli']);
     grunt.registerTask('frontEndTest',['karma','casper:frontend']);
-    grunt.registerTask('frontAndServerSideTest','This will run tests by starting up express (sentia), run front-end tests,  stop express (sentia), run server side tests',
-        ['express:test:start', 'karma','casper:frontend','test','express:test:stop','mochacli']);
-    grunt.registerTask('build', ['frontAndServerSideTest', 'ngAnnotate', 'css', 'js', 'copy']);
+    grunt.registerTask('frontAndServerSideTest','This will run tests by starting up express (sentia), run front-end tests,  stop express (sentia), run server side tests',['express:test:start', 'karma','casper:frontend','test','express:test:stop','mochacli']);
+    grunt.registerTask('build', [ 'ngAnnotate', 'css', 'js', 'copy']);
     grunt.registerTask('default', ['build']);
 
 

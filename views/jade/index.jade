@@ -1,0 +1,17 @@
+extends _root_
+
+block content
+  .container-fluid
+    .row
+      .col-lg-2
+        #nav
+          .title Sentia Reports
+          hr
+          ul.report_list
+            li: a#vpcs VPCs
+            li: a#external_ips External IPs
+            li: a#instances Instances
+            li: a#secgroups Security Groups
+            li: a#subnets Subnets
+      .col-lg-10
+        #results

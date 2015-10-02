@@ -10,7 +10,14 @@
         root: '/',
         isIE: /msie/i.test(navigator.userAgent) && !window.opera, //easy way to determine if ie
         isLowerIE8: (document.all && !document.querySelector) ? true: false,  //ie less than ie 8
-        dispatcher: dispatcher
+        dispatcher: dispatcher,
+        api:
+        {
+            instancesUrl: '/api/instances/?filter={"providers": ["aws"] }',
+            availabilityZonesUrl: '/api/availabilityzones/?filter={"providers": ["aws"] }',
+            vpcsUrl:'/api/vpcs/?filter={"providers": ["aws"] }',
+            subnetsUrl:'/api/subnets/?filter={"providers": ["aws"] }'
+        }
     };
 
     //localize or create a new Javascript Template Object

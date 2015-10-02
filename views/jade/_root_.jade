@@ -1,0 +1,12 @@
+doctype html
+html
+  head
+    title Sentia Reports
+    link(rel='stylesheet', href='/public/static/css/main-report.min.css')
+    script.
+      var baseUrl = !{JSON.stringify(settings.baseUrl)};    
+  body
+    block content
+    script(src='/public/apps/reports/bower-report.js')
+    script(src='/public/apps/reports/reports.js')
+    script(src='/public/apps/reports/index.js')

@@ -23,7 +23,8 @@ define(["app", "backbone", "d3", "components/networkchart/views/networkChartView
 
          //calculate # of regions  , fetch is async , so wait until done then
          //create regionCollection base on querying aws.availabilityZones
-         availabilityZoneList.url = "http://localhost:8080/edda/api/v2/aws/availabilityzones;_pp;_meta;";
+         //generic api
+         availabilityZoneList.url = app.api.availabilityZonesUrl;
          $.when(availabilityZoneList.fetch({
                  type: "GET",
                  cache: true,
@@ -45,7 +46,8 @@ define(["app", "backbone", "d3", "components/networkchart/views/networkChartView
                  });
 
                  //Get Instances
-                 instanceList.url = "http://localhost:8080/edda/api/v2/view/instances;_pp;_meta;";
+                 //generic api
+                 instanceList.url = app.api.instancesUrl;
                  $.when(instanceList.fetch({
                          type: "GET",
                          cache: true,
@@ -89,8 +91,8 @@ define(["app", "backbone", "d3", "components/networkchart/views/networkChartView
                              region.set("vpcCollection",vpcsInRegion);
                              region.set("numberOfInstances",numberOfInstancesInRegion);
                          });
-
-                        vpcList.url = "http://localhost:8080/edda/api/v2/aws/vpcs;_pp;_meta;";
+                        //generic api
+                         vpcList.url = app.api.vpcsUrl;
                          $.when(vpcList.fetch({
                                  type: "GET",
                                  cache: true,
@@ -128,8 +130,8 @@ define(["app", "backbone", "d3", "components/networkchart/views/networkChartView
                                });
 
                              });
-
-                         subnetList.url = "http://localhost:8080/edda/api/v2/aws/subnets;_pp;_meta;";
+                         //generic api
+                         subnetList.url = app.api.subnetsUrl;
                          $.when(subnetList.fetch({
                                  type: "GET",
                                  cache: true,
