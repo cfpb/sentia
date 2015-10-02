@@ -99,7 +99,7 @@ module.exports = function (grunt) {
                 options: {
                     // The src/vendor paths are needed to find the CF components' files.
                     // Feel free to add additional paths to the array passed to `concat`.
-                    paths: grunt.file.expand('src/public/vendor/*').concat([])
+                    paths: grunt.file.expand('src/vendor/*').concat([])
                 },
                 files: {
                     '<%= loc.dist %>/public/static/css/main.css': ['<%= loc.src %>/public/static/css/main.less'],
@@ -195,8 +195,7 @@ module.exports = function (grunt) {
                 },
                 files: {
                     '<%= loc.dist %>/public/static/css/main.min.css': ['<%= loc.dist %>/public/static/css/main.css'],
-                    '<%= loc.dist %>/public/static/css/main-report.min.css': ['<%= loc.dist %>/public/static/css/main-report.css'],
-                    '<%= loc.dist %>/public/static/css/bower-report.min.css': ['<%= loc.dist %>/public/static/css/bower-report.css'],
+                    '<%= loc.dist %>/public/static/css/main-report.min.css': ['<%= loc.dist %>/public/static/css/main-report.css']
                 }
             },
             'ie-alternate': {
@@ -205,8 +204,7 @@ module.exports = function (grunt) {
                 },
                 files: {
                     '<%= loc.dist %>/public/static/css/main.ie.min.css': ['<%= loc.dist %>/public/static/css/main.ie.css'],
-                    '<%= loc.dist %>/public/static/css/main-report.ie.min.css': ['<%= loc.dist %>/public/static/css/main-report.ie.css'],
-                    '<%= loc.dist %>/public/static/css/bower-report.ie.min.css': ['<%= loc.dist %>/public/static/css/bower-report.ie.css']
+                    '<%= loc.dist %>/public/static/css/main-report.ie.min.css': ['<%= loc.dist %>/public/static/css/main-report.ie.css']
                 }
             }
         },
