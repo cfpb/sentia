@@ -9,7 +9,7 @@ Sentia provides a simple way for stakeholders across your teams to see instructu
 
 ## The Stack
 #### Back-end
-* Netflix Edda
+* Netflix OSS Edda
 * Python Crawling Tools
 * ElasticSearch
 #### Front-end (Current Contents of Repo)
