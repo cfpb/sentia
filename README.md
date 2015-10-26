@@ -10,7 +10,7 @@ Sentia provides a simple way for stakeholders across your teams to see instructu
 ## The Stack
 #### Back-end
 * Netflix OSS Edda
-* Python Crawling Tools
+* Python Crawling tools now in github.com/cfpb/sentia-softwarediscovery
 * ElasticSearch
 #### Front-end (Current Contents of Repo)
 * CFPB Capital Framework
