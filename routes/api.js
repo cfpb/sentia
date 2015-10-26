@@ -78,7 +78,7 @@ router.get('/:action', function(req, res, next) {
         }, function(err, result) {
             if (err) return res.status(400).send({error: err});
             var final_result = _.flatten(result, true);
-            res.send(final_result);
+            res.type('json').send(final_result);
         });
 
     }
@@ -130,7 +130,7 @@ router.get('/:action', function(req, res, next) {
         }
         else {
             var final_result = _.flatten(result, true);
-            res.send(final_result);
+            res.type('json').send(final_result);
         }
     }
 });
@@ -189,7 +189,7 @@ router.get('/:action/:providers', function(req, res, next) {
         }
         else {
             var final_result = _.flatten(result, true);
-            res.send(final_result);
+            res.type('json').send(final_result);
         }
     }
 
